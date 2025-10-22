@@ -1,0 +1,14 @@
+use_frameworks!
+
+platform :ios, '12.0'
+
+target 'SeelWidget_Example' do
+  
+  pod 'SeelWidget', :path => '../'
+
+  target 'SeelWidget_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
