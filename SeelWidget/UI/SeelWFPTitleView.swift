@@ -9,6 +9,8 @@ final class SeelWFPTitleView: UIView {
     
     public var price: Double?
     
+    public var loading: Bool = false
+    
     public var showInfo: Bool = false
     
     public var showPowered: Bool = false
@@ -48,6 +50,7 @@ final class SeelWFPTitleView: UIView {
     private lazy var seelIcon = UIImageView(image: UIImage(swName: "seel_icon"))
     private lazy var titleLabel = UILabel(frame: .zero)
     private lazy var priceLable = UILabel(frame: .zero)
+    private lazy var animationView = LoadingAnimationView(frame: .init(x: 0, y: 0, width: 30, height: 11))
     
     private lazy var infoButton: UIButton = {
         let infoButton = UIButton(type: .custom)
@@ -85,6 +88,7 @@ final class SeelWFPTitleView: UIView {
         
         titleSV.addArrangedSubview(titleLabel)
         titleSV.addArrangedSubview(priceLable)
+        titleSV.addArrangedSubview(animationView)
         titleSV.addArrangedSubview(infoButton)
         
         detailSV.addArrangedSubview(poweredLabel)
@@ -115,6 +119,10 @@ final class SeelWFPTitleView: UIView {
         infoButton.snp.makeConstraints { make in
             make.width.height.equalTo(12)
         }
+        animationView.snp.makeConstraints { make in
+            make.width.equalTo(30)
+            make.height.equalTo(11)
+        }
         infoExtensionButton.snp.makeConstraints { make in
             make.center.equalTo(infoButton)
             make.width.height.equalTo(36)
@@ -124,8 +132,15 @@ final class SeelWFPTitleView: UIView {
     func updateViews() {
         titleLabel.text = title
         
-        priceLable.isHidden = price == nil
-        priceLable.text = "for $\(String(describing: price ?? 0))"
+        priceLable.isHidden = price == nil && !loading
+        animationView.isHidden = !loading
+        if loading {
+            priceLable.text = "for"
+            animationView.startAnimating()
+        } else {
+            priceLable.text = "for $\(String(describing: price ?? 0))"
+            animationView.stopAnimating()
+        }
         
         infoButton.isHidden = !showInfo
         

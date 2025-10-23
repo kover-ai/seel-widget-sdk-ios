@@ -102,6 +102,7 @@ public final class SeelWFPView: UIView {
         titleView.title = quoteResponse?.extraInfo?.widgetTitle
         titleView.price = isRejected ? nil : quoteResponse?.price
         titleView.showInfo = !isRejected && quoteResponse != nil
+        titleView.loading = loading
         titleView.updateViews()
         
         // Use enum convenience methods for status checking
@@ -185,6 +186,7 @@ public final class SeelWFPView: UIView {
 
     func createQuote(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
         loading = true
+        updateViews()
         NetworkManager.shared.createQuote(quote, completion: { [weak self] result in
             self?.loading = false
             completion(result)
