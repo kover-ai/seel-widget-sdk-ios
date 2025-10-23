@@ -114,7 +114,16 @@ class TestDatas {
     
     class func getEvent() -> EventsRequest {
         var event = EventsRequest(sessionID: "3b87ea2a6cecdb94bae186263feb9e7f", customerID: "1111", eventSource: "ios", eventType: "product_page_enter")
-        event.eventInfo = EventInfo(userEmail: "xie@seel.com")
+        event.eventInfo = [
+            "user_email": AnyCodable("xie@seel.com"),
+            "user_phone_number": AnyCodable("+1234567890"),
+            "shipping_address": AnyCodable([
+                "shipping_address_country": "US",
+                "shipping_address_state": "CA",
+                "shipping_address_city": "San Francisco",
+                "shipping_address_zipcode": "94102"
+            ])
+        ]
         return event
     }
     

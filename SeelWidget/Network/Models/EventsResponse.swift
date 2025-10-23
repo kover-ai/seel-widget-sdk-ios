@@ -1,3 +1,5 @@
+import Foundation
+
 public struct EventsResponse: Codable {
     
     /// Session ID
@@ -24,7 +26,7 @@ public struct EventsResponse: Codable {
     
     /// Event information object
     /// Each event_type has its own unique schema. For specific details, please refer to the custom pixel guide.
-    public var eventInfo: EventInfo?
+    public var eventInfo: [String: AnyCodable]?
     
     public init(sessionID: String, customerID: String, eventSource: String, eventType: String) {
         self.sessionID = sessionID
