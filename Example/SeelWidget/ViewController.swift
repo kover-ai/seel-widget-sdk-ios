@@ -147,6 +147,8 @@ class ViewController: UIViewController {
         view.addSubview(eventButton)
         view.addSubview(loadingIndicator)
         
+        SeelWFPView.optedExpiredTime = TestDatas.defaultOptedExpiredTime
+        
         errorLabel.text = "Error Data"
         
         acceptedLabel.text = "Status Accepted"

@@ -26,6 +26,9 @@ public extension Dictionary where Key == String, Value == Any {
 
 class TestDatas {
     
+    /// Default Opted Expired Time: 30 mins
+    static let defaultOptedExpiredTime: TimeInterval = 30 * 60
+    
     static let apiKey: String = "yojct9zbwxok8961hr7e1s6i3fgmm1o1"
     
     class func getQuote(_ accepted: Bool = true, defaultOn: Bool = true, itemCount: Int = 3, error: Bool = false) -> QuotesRequest? {

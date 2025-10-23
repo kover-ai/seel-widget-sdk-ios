@@ -5,6 +5,10 @@ public typealias WFPOptedIn = (_ optedIn: Bool, _ quote: QuotesResponse?) -> Voi
 
 public final class SeelWFPView: UIView {
     
+    /// Opted Expired Time
+    /// nil or 0: Never
+    public static var optedExpiredTime: TimeInterval?
+    
     public var optedIn: WFPOptedIn?
     
     private var loading: Bool = false
@@ -45,7 +49,7 @@ public final class SeelWFPView: UIView {
         let switcher = SeelSwitch()
         switcher.onTintColor = UIColor(hex: "#2121C4")
         switcher.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
-        switcher.isOn = false
+        switcher.isOn = true
         switcher.onValueChanged = { [weak self] isOn in
             self?.statusChanged(isOn)
         }
@@ -141,11 +145,11 @@ public final class SeelWFPView: UIView {
             let infoViewController = SeelWFPInfoViewController(quoteResponse: quoteResponse)
             infoViewController.modalPresentationStyle = .overFullScreen
             infoViewController.optedInClicked = { [weak self] in
-                _ = self?.turnOn(true)
+                _ = self?.turnOnIfNeed(true)
                 infoViewController.dismiss(animated: true)
             }
             infoViewController.noNeedClicked = { [weak self] in
-                _ = self?.turnOn(false)
+                _ = self?.turnOnIfNeed(false)
                 infoViewController.dismiss(animated: true)
             }
             infoViewController.privacyPolicyClicked = { [weak self] in
@@ -167,7 +171,8 @@ public final class SeelWFPView: UIView {
     }
     
     func statusChanged(_ isOn: Bool) {
-        _ = optedChanged(isOn)
+        let newOptIn = optedChanged(isOn)
+        updateLocalOptedIn(newOptIn)
     }
     
     public func setup(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
@@ -185,40 +190,31 @@ public final class SeelWFPView: UIView {
     }
 
     func createQuote(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
+        var _quote = quote
+        _quote.isDefaultOn = localOptedIn() ?? switcher.isOn
         loading = true
         updateViews()
-        NetworkManager.shared.createQuote(quote, completion: { [weak self] result in
+        NetworkManager.shared.createQuote(_quote, completion: { [weak self] result in
             self?.loading = false
             completion(result)
             switch result {
             case .success(let value):
-                let isCurrentOn = self?.switcher.isOn ?? false
-                
                 self?.quoteResponse = value
                 self?.updateViews()
                 
-                var isTargetOn = value.isDefaultOn == true
-                let canOptedIn = self?.canOptedIn() ?? false
-                if !canOptedIn {
-                    isTargetOn = false
-                }
-                if isCurrentOn != isTargetOn {
-                    _ = self?.turnOn(isTargetOn)
-                }
+                _ = self?.turnOnIfNeed(value.isDefaultOn ?? false)
             case .failure(_):
                 self?.quoteResponse = nil
                 self?.updateViews()
+                _ = self?.optedChanged(false)
             }
         })
     }
     
-    func turnOn(_ on: Bool) -> Bool {
-        let canOptedIn = canOptedIn()
-        if !canOptedIn {
-            return false
-        }
-        switcher.isOn = on
-        return optedChanged(on)
+    func turnOnIfNeed(_ on: Bool) -> Bool {
+        let isTargetOn = optedChanged(on)
+        switcher.isOn = isTargetOn
+        return isTargetOn
     }
     
     func canOptedIn() -> Bool {
@@ -231,14 +227,46 @@ public final class SeelWFPView: UIView {
     }
     
     func optedChanged(_ opted: Bool) -> Bool {
+        var isTargetOn = opted
         let canOptedIn = canOptedIn()
         if !canOptedIn {
-            return false
+            isTargetOn = false
         }
         if let _optedIn = optedIn {
-            _optedIn(opted, quoteResponse)
+            _optedIn(isTargetOn, quoteResponse)
         }
-        return true
+        return isTargetOn
     }
+    
+}
+
+extension SeelWFPView {
+    
+    public func cleanLocalOpted() {
+        UserDefaults.standard.removeObject(forKey: Constants.optedValueKey)
+        UserDefaults.standard.removeObject(forKey: Constants.optedExpiredTimeKey)
+    }
+    
+    func updateLocalOptedIn(_ optedIn: Bool) {
+        UserDefaults.standard.set(optedIn, forKey: Constants.optedValueKey)
+        if let _optedExpiredTime = SeelWFPView.optedExpiredTime,
+           _optedExpiredTime > 0
+        {
+            UserDefaults.standard.set(Date().timeIntervalSince1970 + _optedExpiredTime, forKey: Constants.optedExpiredTimeKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: Constants.optedExpiredTimeKey)
+        }
+    }
+    
+    func localOptedIn() -> Bool? {
+        let optedExpiredTime = UserDefaults.standard.value(forKey: Constants.optedExpiredTimeKey) as? TimeInterval
+        if let _optedExpiredTime = optedExpiredTime,
+           _optedExpiredTime > Date().timeIntervalSince1970
+        {
+            return UserDefaults.standard.value(forKey: Constants.optedValueKey) as? Bool
+        }
+        return nil
+    }
+    
     
 }

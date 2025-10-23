@@ -2,6 +2,9 @@ import Foundation
 
 public struct EventsRequest: Codable {
     
+    /// Event ID
+    var eventID: String?
+    
     /// Session ID
     public var sessionID: String?
     
