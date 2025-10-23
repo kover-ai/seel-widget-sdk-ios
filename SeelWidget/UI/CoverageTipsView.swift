@@ -31,7 +31,7 @@ final class CoverageTipsView: UIView {
         resolutionTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         resolutionTitleLabel.textColor = UIColor(hex: "#1E2022")
         resolutionTitleLabel.numberOfLines = 0
-        resolutionTitleLabel.text = "Easy resolution"
+        resolutionTitleLabel.text = "Easy Resolution"
         
         resolutionDetailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         resolutionDetailLabel.textColor = UIColor(hex: "#565656")

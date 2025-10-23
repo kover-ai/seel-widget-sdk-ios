@@ -101,7 +101,7 @@ final class SeelWFPTitleView: UIView {
         priceLable.font = UIFont.systemFont(ofSize: 10, weight: .regular)
         priceLable.textColor = UIColor(hex: "#000000")
         
-        poweredLabel.text = "Powered by".uppercased()
+        poweredLabel.text = "Powered by"
         poweredLabel.font = UIFont.systemFont(ofSize: 7.5, weight: .semibold)
         poweredLabel.textColor = UIColor(hex: "#565656")
         
