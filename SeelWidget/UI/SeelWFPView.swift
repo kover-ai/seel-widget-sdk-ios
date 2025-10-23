@@ -242,7 +242,7 @@ public final class SeelWFPView: UIView {
 
 extension SeelWFPView {
     
-    public func cleanLocalOpted() {
+    public class func cleanLocalOpted() {
         UserDefaults.standard.removeObject(forKey: Constants.optedValueKey)
         UserDefaults.standard.removeObject(forKey: Constants.optedExpiredTimeKey)
     }

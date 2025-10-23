@@ -69,6 +69,23 @@ class ViewController: UIViewController {
         return button
     }()
     
+    private lazy var cleanButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setTitle("Clean OptedIn", for: .normal)
+        button.addTarget(self, action: #selector(cleanOptedIn), for: .touchUpInside)
+        if #available(iOS 13.0, *) {
+            button.backgroundColor = .systemBlue
+        } else {
+            button.backgroundColor = .blue
+        }
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
+        button.layer.cornerRadius = 8
+        button.clipsToBounds = true
+        return button
+    }()
+    
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         if #available(iOS 13.0, *) {
             let indicator = UIActivityIndicatorView(style: .medium)
@@ -145,6 +162,7 @@ class ViewController: UIViewController {
         view.addSubview(setupButton)
         view.addSubview(updateButton)
         view.addSubview(eventButton)
+        view.addSubview(cleanButton)
         view.addSubview(loadingIndicator)
         
         SeelWFPView.optedExpiredTime = TestDatas.defaultOptedExpiredTime
@@ -211,6 +229,10 @@ class ViewController: UIViewController {
             make.top.equalTo(setupButton.snp.bottom).offset(16)
             make.left.equalTo(wfpView)
         }
+        cleanButton.snp.makeConstraints { make in
+            make.top.equalTo(setupButton.snp.bottom).offset(16)
+            make.right.equalTo(wfpView)
+        }
         loadingIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
@@ -260,6 +282,10 @@ class ViewController: UIViewController {
             self?.loading(false)
             TestDatas.printResult(result, successLabel: "Event Success JSON")
         }
+    }
+    
+    @objc func cleanOptedIn() {
+        SeelWFPView.cleanLocalOpted()
     }
     
     func loading(_ loading: Bool) {
