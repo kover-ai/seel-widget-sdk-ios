@@ -349,16 +349,6 @@ var optedIn: WFPOptedIn?
 - **event_source** (String, required): Event source.
 - **event_type** (String, required): Event type, e.g., `product_page_enter`, `cart_add`, `checkout_complete`.
 - **event_info** (EventInfo, optional): Event information object (schema varies by event_type).
-
-##### EventInfo
-- **user_email** (String, optional)
-- **user_phone_number** (String, optional)
-- **shipping_address** (EventShippingAddress, optional)
-
-##### EventShippingAddress
-- **shipping_address_country** (String, optional)
-- **shipping_address_state** (String, optional)
-- **shipping_address_city** (String, optional)
 - **shipping_address_zipcode** (String, optional)
 
 ---
