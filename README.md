@@ -347,7 +347,7 @@ var optedIn: WFPOptedIn?
 - **device_id** (String, optional): Device ID.
 - **client_ip** (String, optional): Client IP address.
 - **event_source** (String, required): Event source.
-- **event_type** (String, required): Event type, e.g., `product_page_enter`, `cart_add`, `checkout_complete`.
+- **event_type** (String, required): Event type, e.g., `product_viewed`.
 - **event_info** (EventInfo, optional): Event information object (schema varies by event_type).
 - **shipping_address_zipcode** (String, optional)
 
