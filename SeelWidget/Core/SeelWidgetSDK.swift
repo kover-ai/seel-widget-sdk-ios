@@ -43,6 +43,8 @@ public class SeelWidgetSDK {
     }
     
     public func createEvents(_ event: EventsRequest, completion: @escaping (Result<EventsResponse, NetworkError>) -> Void) {
-        NetworkManager.shared.createEvents(event, completion: completion)
+        var _event = event
+        _event.eventID = UUID().uuidString
+        NetworkManager.shared.createEvents(_event, completion: completion)
     }
 }
