@@ -5,9 +5,9 @@ public typealias WFPOptedIn = (_ optedIn: Bool, _ quote: QuotesResponse?) -> Voi
 
 public final class SeelWFPView: UIView {
     
-    /// Opted Expired Time
-    /// nil or 0: Never
-    public static var optedExpiredTime: TimeInterval?
+    /// Opted Valid Time
+    /// <=0: Never Expired
+    public static var optedValidTime: TimeInterval = 0
     
     public var optedIn: WFPOptedIn?
     
@@ -110,9 +110,9 @@ public final class SeelWFPView: UIView {
         titleView.updateViews()
         
         // Use enum convenience methods for status checking
-        switcher.isHidden = quoteResponse == nil || quoteResponse?.status == .rejected
+        switcher.isHidden = quoteResponse == nil || isRejected
         
-        detailSV.isHidden = quoteResponse == nil || quoteResponse?.status != .rejected
+        detailSV.isHidden = quoteResponse == nil || !isRejected
         
         let msgs: [String] = quoteResponse?.extraInfo?.displayWidgetText ?? []
         
@@ -244,28 +244,22 @@ extension SeelWFPView {
     
     public class func cleanLocalOpted() {
         UserDefaults.standard.removeObject(forKey: Constants.optedValueKey)
-        UserDefaults.standard.removeObject(forKey: Constants.optedExpiredTimeKey)
+        UserDefaults.standard.removeObject(forKey: Constants.optedOperationTimeKey)
     }
     
     func updateLocalOptedIn(_ optedIn: Bool) {
         UserDefaults.standard.set(optedIn, forKey: Constants.optedValueKey)
-        if let _optedExpiredTime = SeelWFPView.optedExpiredTime,
-           _optedExpiredTime > 0
-        {
-            UserDefaults.standard.set(Date().timeIntervalSince1970 + _optedExpiredTime, forKey: Constants.optedExpiredTimeKey)
-        } else {
-            UserDefaults.standard.removeObject(forKey: Constants.optedExpiredTimeKey)
-        }
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: Constants.optedOperationTimeKey)
     }
     
     func localOptedIn() -> Bool? {
-        let optedExpiredTime = UserDefaults.standard.value(forKey: Constants.optedExpiredTimeKey) as? TimeInterval
-        if let _optedExpiredTime = optedExpiredTime,
-           _optedExpiredTime > Date().timeIntervalSince1970
-        {
-            return UserDefaults.standard.value(forKey: Constants.optedValueKey) as? Bool
+        if SeelWFPView.optedValidTime > 0 {
+            guard let _optedOperationTime = UserDefaults.standard.value(forKey: Constants.optedOperationTimeKey) as? TimeInterval,
+                  (_optedOperationTime + SeelWFPView.optedValidTime) > Date().timeIntervalSince1970 else {
+                return nil
+            }
         }
-        return nil
+        return UserDefaults.standard.value(forKey: Constants.optedValueKey) as? Bool
     }
     
     

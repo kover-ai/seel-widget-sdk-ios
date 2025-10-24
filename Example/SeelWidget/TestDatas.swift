@@ -26,8 +26,10 @@ public extension Dictionary where Key == String, Value == Any {
 
 class TestDatas {
     
-    /// Default Opted Expired Time: 30 mins
-    static let defaultOptedExpiredTime: TimeInterval = 30 * 60
+    /// Default Opted Valid Time: 30 mins
+    static let defaultOptedValidTime: Double = 30
+    
+    static let optedValidTimeKey = "OptedValidTimeKey"
     
     static let apiKey: String = "yojct9zbwxok8961hr7e1s6i3fgmm1o1"
     

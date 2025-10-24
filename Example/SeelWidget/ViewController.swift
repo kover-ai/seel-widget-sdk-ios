@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     
     private lazy var setupButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle("Setup", for: .normal)
+        button.setTitle("Setup Widget", for: .normal)
         button.addTarget(self, action: #selector(setup), for: .touchUpInside)
         if #available(iOS 13.0, *) {
             button.backgroundColor = .systemBlue
@@ -37,7 +37,7 @@ class ViewController: UIViewController {
     
     private lazy var updateButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle("Update", for: .normal)
+        button.setTitle("Update Widget", for: .normal)
         button.addTarget(self, action: #selector(update), for: .touchUpInside)
         if #available(iOS 13.0, *) {
             button.backgroundColor = .systemBlue
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
     
     private lazy var cleanButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle("Clean OptedIn", for: .normal)
+        button.setTitle("Clean OptedIn Cache", for: .normal)
         button.addTarget(self, action: #selector(cleanOptedIn), for: .touchUpInside)
         if #available(iOS 13.0, *) {
             button.backgroundColor = .systemBlue
@@ -84,6 +84,12 @@ class ViewController: UIViewController {
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
         return button
+    }()
+    
+    private lazy var dividingLine: UIView = {
+        let line = UIView(frame: .zero)
+        line.backgroundColor = .black
+        return line
     }()
     
     private lazy var loadingIndicator: UIActivityIndicatorView = {
@@ -140,6 +146,29 @@ class ViewController: UIViewController {
         stepper.addTarget(self, action: #selector(countChanged), for: .valueChanged)
         return stepper
     }()
+    
+    private lazy var optedValidTimeLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .right
+        label.text = "Opted Valid Time (min/mins)"
+        return label
+    }()
+    
+    private lazy var optedValidTimeValueLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .right
+        label.text = String(Int(localValidTime()))
+        return label
+    }()
+    
+    private lazy var optedValidTimeSlider: UISlider = {
+        let slider = UISlider()
+        slider.minimumValue = 0
+        slider.maximumValue = 60
+        slider.value = Float(localValidTime())
+        slider.addTarget(self, action: #selector(optedValidTimeChanged), for: .valueChanged)
+        return slider
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -158,6 +187,11 @@ class ViewController: UIViewController {
         view.addSubview(countLabel)
         view.addSubview(countValueLabel)
         view.addSubview(countStepper)
+        view.addSubview(optedValidTimeLabel)
+        view.addSubview(optedValidTimeValueLabel)
+        view.addSubview(optedValidTimeSlider)
+        
+        view.addSubview(dividingLine)
         
         view.addSubview(setupButton)
         view.addSubview(updateButton)
@@ -165,7 +199,7 @@ class ViewController: UIViewController {
         view.addSubview(cleanButton)
         view.addSubview(loadingIndicator)
         
-        SeelWFPView.optedExpiredTime = TestDatas.defaultOptedExpiredTime
+        SeelWFPView.optedValidTime = TestDatas.defaultOptedValidTime
         
         errorLabel.text = "Error Data"
         
@@ -217,12 +251,32 @@ class ViewController: UIViewController {
             make.centerY.equalTo(countLabel)
             make.right.equalTo(countStepper.snp.left).offset(-8)
         }
+        optedValidTimeLabel.snp.makeConstraints { make in
+            make.top.equalTo(countLabel.snp.bottom).offset(12)
+            make.left.equalTo(wfpView)
+        }
+        optedValidTimeValueLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(optedValidTimeLabel)
+            make.right.equalTo(wfpView)
+//            make.right.equalTo(optedValidTimeStepper.snp.left).offset(-8)
+        }
+        optedValidTimeSlider.snp.makeConstraints { make in
+            make.top.equalTo(optedValidTimeLabel.snp.bottom).offset(12)
+            make.left.right.equalTo(wfpView)
+        }
+        
+        dividingLine.snp.makeConstraints { make in
+            make.top.equalTo(optedValidTimeSlider.snp.bottom).offset(16)
+            make.left.right.equalTo(wfpView)
+            make.height.equalTo(1)
+        }
+        // buttons
         setupButton.snp.makeConstraints { make in
-            make.top.equalTo(countLabel.snp.bottom).offset(16)
+            make.top.equalTo(dividingLine.snp.bottom).offset(16)
             make.left.equalTo(wfpView)
         }
         updateButton.snp.makeConstraints { make in
-            make.top.equalTo(countLabel.snp.bottom).offset(16)
+            make.top.equalTo(dividingLine.snp.bottom).offset(16)
             make.right.equalTo(wfpView)
         }
         eventButton.snp.makeConstraints { make in
@@ -242,6 +296,41 @@ class ViewController: UIViewController {
         }
         SeelWidgetSDK.shared.configure(apiKey: TestDatas.apiKey, environment: .development)
     }
+    
+    @objc func countChanged() {
+        countValueLabel.text = String(Int(countStepper.value))
+    }
+    
+    @objc func optedValidTimeChanged() {
+        let optedValidTimeMins = Double(optedValidTimeSlider.value)
+        saveLocalValidTime(optedValidTimeMins)
+        optedValidTimeValueLabel.text = String(Int(optedValidTimeMins))
+        SeelWFPView.optedValidTime = optedValidTimeMins * 60
+    }
+    
+    @objc func cleanOptedIn() {
+        SeelWFPView.cleanLocalOpted()
+    }
+    
+    func loading(_ loading: Bool) {
+        // Handle loading state
+        if loading {
+            view.isUserInteractionEnabled = false
+            loadingIndicator.startAnimating()
+        } else {
+            view.isUserInteractionEnabled = true
+            loadingIndicator.stopAnimating()
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+}
+
+extension ViewController {
     
     @objc func setup() {
         print("setting up...")
@@ -269,10 +358,6 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func countChanged() {
-        countValueLabel.text = String(Int(countStepper.value))
-    }
-    
     @objc func sendEvents() {
         let event = TestDatas.getEvent()
         print("sending event...")
@@ -284,25 +369,13 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func cleanOptedIn() {
-        SeelWFPView.cleanLocalOpted()
+    func localValidTime() -> Double {
+        return UserDefaults.standard.value(forKey: TestDatas.optedValidTimeKey) as? Double ?? TestDatas.defaultOptedValidTime
     }
     
-    func loading(_ loading: Bool) {
-        // Handle loading state
-        if loading {
-            view.isUserInteractionEnabled = false
-            loadingIndicator.startAnimating()
-        } else {
-            view.isUserInteractionEnabled = true
-            loadingIndicator.stopAnimating()
-        }
+    func saveLocalValidTime(_ time: Double) {
+        UserDefaults.standard.set(time, forKey: TestDatas.optedValidTimeKey)
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
+    
 }
 
