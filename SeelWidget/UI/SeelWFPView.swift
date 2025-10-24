@@ -7,7 +7,8 @@ public final class SeelWFPView: UIView {
     
     /// Opted Valid Time
     /// <=0: Never Expired
-    public static var optedValidTime: TimeInterval = 0
+    /// Default is 365 days
+    public static var optedValidTime: TimeInterval = 365 * 24 * 3600
     
     public var optedIn: WFPOptedIn?
     
