@@ -169,6 +169,13 @@ class ViewController: UIViewController {
         slider.addTarget(self, action: #selector(optedValidTimeChanged), for: .valueChanged)
         return slider
     }()
+    
+    private lazy var cacheInfoLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .right
+        label.numberOfLines = 0
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -199,7 +206,9 @@ class ViewController: UIViewController {
         view.addSubview(cleanButton)
         view.addSubview(loadingIndicator)
         
-        SeelWFPView.optedValidTime = TestDatas.defaultOptedValidTime
+        view.addSubview(cacheInfoLabel)
+        
+        SeelWFPView.optedValidTime = TestDatas.defaultOptedValidTime * 60
         
         errorLabel.text = "Error Data"
         
@@ -290,11 +299,36 @@ class ViewController: UIViewController {
         loadingIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+        cacheInfoLabel.snp.makeConstraints { make in
+            make.top.equalTo(cleanButton.snp.bottom).offset(16)
+            make.left.right.equalTo(wfpView)
+        }
         
-        wfpView.optedIn = { optedIn, quote in
+        wfpView.optedIn = { [weak self] optedIn, quote in
             print("optedIn:\(optedIn) price:\(quote?.price ?? 0)")
+            self?.updateViews()
         }
         SeelWidgetSDK.shared.configure(apiKey: TestDatas.apiKey, environment: .development)
+        
+        updateViews()
+    }
+    
+    func updateViews() {
+        let _optedOperationTime = UserDefaults.standard.value(forKey: TestDatas.optedOperationTimeKey) as? TimeInterval
+        let _optedValue = UserDefaults.standard.value(forKey: TestDatas.optedValueKey) as? Bool
+        let optedOperationTimeString: String = _optedOperationTime != nil ? formatTimeInterval(_optedOperationTime!) : "-"
+        let optedValueString: String = _optedValue != nil ? "\(String(describing: _optedValue!))" : "-"
+        cacheInfoLabel.text = "Operating Time: \(optedOperationTimeString) optedIn:\(optedValueString)"
+    }
+    
+    func formatTimeInterval(_ timeInterval: TimeInterval) -> String {
+        let date = Date(timeIntervalSince1970: timeInterval)
+        let formatter = DateFormatter()
+        
+        formatter.dateFormat = "MMM. dd, yyyy HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        return formatter.string(from: date)
     }
     
     @objc func countChanged() {
@@ -306,10 +340,12 @@ class ViewController: UIViewController {
         saveLocalValidTime(optedValidTimeMins)
         optedValidTimeValueLabel.text = String(Int(optedValidTimeMins))
         SeelWFPView.optedValidTime = optedValidTimeMins * 60
+        updateViews()
     }
     
     @objc func cleanOptedIn() {
         SeelWFPView.cleanLocalOpted()
+        updateViews()
     }
     
     func loading(_ loading: Bool) {

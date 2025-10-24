@@ -30,6 +30,8 @@ class TestDatas {
     static let defaultOptedValidTime: Double = 30
     
     static let optedValidTimeKey = "OptedValidTimeKey"
+    static let optedValueKey = "Seel.OptedValueKey"
+    static let optedOperationTimeKey = "Seel.OptedOperationTimeKey"
     
     static let apiKey: String = "yojct9zbwxok8961hr7e1s6i3fgmm1o1"
     

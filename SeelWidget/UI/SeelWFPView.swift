@@ -171,16 +171,16 @@ public final class SeelWFPView: UIView {
     }
     
     func statusChanged(_ isOn: Bool) {
-        let newOptIn = optedChanged(isOn)
-        updateLocalOptedIn(newOptIn)
+        updateLocalOptedIn(isOn)
+        _ = optedChanged(isOn)
     }
     
     public func setup(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
-        createQuote(quote, completion: completion)
+        createQuote(quote, isSetup: true, completion: completion)
     }
 
     public func updateWidgetWhenChanged(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
-        createQuote(quote, completion: completion)
+        createQuote(quote, isSetup: false, completion: completion)
     }
     
     func openUrl(_ url: URL, base: UIViewController) {
@@ -189,9 +189,10 @@ public final class SeelWFPView: UIView {
         base.present(webViewController, animated: true)
     }
 
-    func createQuote(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
+    func createQuote(_ quote: QuotesRequest, isSetup: Bool, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
         var _quote = quote
-        _quote.isDefaultOn = localOptedIn() ?? switcher.isOn
+        let isDefaultOn = isSetup ? (quote.isDefaultOn ?? switcher.isOn) : switcher.isOn
+        _quote.isDefaultOn = localOptedIn() ?? isDefaultOn
         loading = true
         updateViews()
         NetworkManager.shared.createQuote(_quote, completion: { [weak self] result in
