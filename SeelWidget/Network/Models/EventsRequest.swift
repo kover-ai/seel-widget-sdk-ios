@@ -43,6 +43,7 @@ public struct EventsRequest: Codable {
     }
     
     enum CodingKeys: String, CodingKey {
+        case eventID = "event_id"
         case sessionID = "session_id"
         case eventTs = "event_ts"
         case customerID = "customer_id"
