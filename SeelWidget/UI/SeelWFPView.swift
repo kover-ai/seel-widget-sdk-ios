@@ -146,10 +146,12 @@ public final class SeelWFPView: UIView {
             let infoViewController = SeelWFPInfoViewController(quoteResponse: quoteResponse)
             infoViewController.modalPresentationStyle = .overFullScreen
             infoViewController.optedInClicked = { [weak self] in
+                self?.updateLocalOptedIn(true)
                 _ = self?.turnOnIfNeed(true)
                 infoViewController.dismiss(animated: true)
             }
             infoViewController.noNeedClicked = { [weak self] in
+                self?.updateLocalOptedIn(false)
                 _ = self?.turnOnIfNeed(false)
                 infoViewController.dismiss(animated: true)
             }

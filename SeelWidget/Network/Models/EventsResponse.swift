@@ -2,6 +2,9 @@ import Foundation
 
 public struct EventsResponse: Codable {
     
+    /// Event ID
+    public var eventID: String?
+    
     /// Session ID
     public var sessionID: String
     
@@ -36,6 +39,7 @@ public struct EventsResponse: Codable {
     }
     
     enum CodingKeys: String, CodingKey {
+        case eventID = "event_id"
         case sessionID = "session_id"
         case eventTs = "event_ts"
         case customerID = "customer_id"
