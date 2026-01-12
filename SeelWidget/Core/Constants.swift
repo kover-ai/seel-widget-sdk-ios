@@ -6,5 +6,6 @@ enum Constants {
     static let userAgent = "seel-widget-sdk-ios/\(version)"
     static let optedValueKey = "Seel.OptedValueKey"
     static let optedOperationTimeKey = "Seel.OptedOperationTimeKey"
+    static let cartIdKey = "Seel.CartIdKey"
     
 }

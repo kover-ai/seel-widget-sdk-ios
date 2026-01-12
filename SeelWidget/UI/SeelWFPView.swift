@@ -139,6 +139,22 @@ public final class SeelWFPView: UIView {
         }
     }
     
+}
+
+extension SeelWFPView {
+    
+    public func setup(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
+        createQuote(quote, isSetup: true, completion: completion)
+    }
+
+    public func updateWidgetWhenChanged(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
+        createQuote(quote, isSetup: false, completion: completion)
+    }
+
+}
+
+extension SeelWFPView {
+    
     func displayInfo() {
         if let viewController = self.parentViewController,
            quoteResponse != nil
@@ -178,14 +194,6 @@ public final class SeelWFPView: UIView {
         _ = optedChanged(isOn)
     }
     
-    public func setup(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
-        createQuote(quote, isSetup: true, completion: completion)
-    }
-
-    public func updateWidgetWhenChanged(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
-        createQuote(quote, isSetup: false, completion: completion)
-    }
-    
     func openUrl(_ url: URL, base: UIViewController) {
         let webViewController = SeelWebViewController(url: url)
         webViewController.modalPresentationStyle = .fullScreen
@@ -193,20 +201,22 @@ public final class SeelWFPView: UIView {
     }
 
     func createQuote(_ quote: QuotesRequest, isSetup: Bool, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
-        var _quote = quote
-        let isDefaultOn = isSetup ? (quote.isDefaultOn ?? switcher.isOn) : switcher.isOn
-        _quote.isDefaultOn = localOptedIn() ?? isDefaultOn
         loading = true
         updateViews()
-        NetworkManager.shared.createQuote(_quote, completion: { [weak self] result in
+        NetworkManager.shared.createQuote(quote, completion: { [weak self] result in
             self?.loading = false
             completion(result)
             switch result {
             case .success(let value):
                 self?.quoteResponse = value
                 self?.updateViews()
-                
-                _ = self?.turnOnIfNeed(value.isDefaultOn ?? false)
+
+                var finalOptedIn = value.isDefaultOn ?? false
+                if let localOptValue = self?.localOptedIn(value.cartID) {
+                    finalOptedIn = localOptValue
+                }
+
+                _ = self?.turnOnIfNeed(finalOptedIn)
             case .failure(_):
                 self?.quoteResponse = nil
                 self?.updateViews()
@@ -252,11 +262,17 @@ extension SeelWFPView {
     }
     
     func updateLocalOptedIn(_ optedIn: Bool) {
+        UserDefaults.standard.set(quoteResponse?.cartID, forKey: Constants.cartIdKey)
         UserDefaults.standard.set(optedIn, forKey: Constants.optedValueKey)
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: Constants.optedOperationTimeKey)
     }
     
-    func localOptedIn() -> Bool? {
+    func localOptedIn(_ cartID: String?) -> Bool? {
+        if cartID != nil,
+           let localCartID = UserDefaults.standard.value(forKey: Constants.cartIdKey) as? String,
+           cartID == localCartID {
+            return UserDefaults.standard.value(forKey: Constants.optedValueKey) as? Bool
+        }
         if SeelWFPView.optedValidTime > 0 {
             guard let _optedOperationTime = UserDefaults.standard.value(forKey: Constants.optedOperationTimeKey) as? TimeInterval,
                   (_optedOperationTime + SeelWFPView.optedValidTime) > Date().timeIntervalSince1970 else {

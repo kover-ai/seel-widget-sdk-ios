@@ -25,12 +25,22 @@ class NetworkManager {
             return "https://api.seel.com"
         }
     }
+
+    /// Events endpoint base URL
+    private var logBaseURL: String {
+        switch seelWidgetSDK.environment {
+        case .development:
+            return "https://log-test.seel.com"
+        case .production:
+            return "https://log.seel.com"
+        }
+    }
     
     // MARK: - Private Methods
     
     /// Build complete URL
-    private func buildURL(endpoint: String) -> String {
-        let base = baseURL
+    private func buildURL(endpoint: String, base customBaseURL: String? = nil) -> String {
+        let base = customBaseURL ?? baseURL
         let cleanEndpoint = endpoint.hasPrefix("/") ? String(endpoint.dropFirst()) : endpoint
         return "\(base)/\(cleanEndpoint)"
     }
@@ -60,13 +70,18 @@ class NetworkManager {
     ///   - responseType: Response type
     ///   - completion: Completion callback
     public func post<T: Codable, R: Codable>(
+        baseURL: String? = nil,
+        timeoutInterval: TimeInterval? = nil,
         endpoint: String,
         requestBody: T,
         responseType: R.Type,
         completion: @escaping (Result<R, NetworkError>) -> Void
     ) {
         do {
-            let configuration = try createDefaultConfiguration()
+            var configuration = try createDefaultConfiguration()
+            if let timeoutInterval = timeoutInterval {
+                configuration.timeoutInterval = timeoutInterval
+            }
             let request = Request(configuration: configuration)
             
             // Convert Codable object to dictionary
@@ -79,7 +94,7 @@ class NetworkManager {
             }
             
             request.post(
-                url: buildURL(endpoint: endpoint),
+                url: buildURL(endpoint: endpoint, base: baseURL),
                 parameters: parameters,
                 responseType: responseType,
                 completion: completion
@@ -96,13 +111,18 @@ class NetworkManager {
     ///   - responseType: Response type
     ///   - completion: Completion callback
     public func get<T: Codable, R: Codable>(
+        baseURL: String? = nil,
+        timeoutInterval: TimeInterval? = nil,
         endpoint: String,
         queryParams: T? = nil,
         responseType: R.Type,
         completion: @escaping (Result<R, NetworkError>) -> Void
     ) {
         do {
-            let configuration = try createDefaultConfiguration()
+            var configuration = try createDefaultConfiguration()
+            if let timeoutInterval = timeoutInterval {
+                configuration.timeoutInterval = timeoutInterval
+            }
             let request = Request(configuration: configuration)
             
             // Convert Codable object to dictionary
@@ -114,7 +134,7 @@ class NetworkManager {
             }
             
             request.get(
-                url: buildURL(endpoint: endpoint),
+                url: buildURL(endpoint: endpoint, base: baseURL),
                 parameters: parameters,
                 responseType: responseType,
                 completion: completion
@@ -129,6 +149,7 @@ extension NetworkManager {
     
     public func createQuote(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
         post(
+            timeoutInterval: 5.0,
             endpoint: "/v1/ecommerce/quotes",
             requestBody: quote,
             responseType: QuotesResponse.self
@@ -141,6 +162,7 @@ extension NetworkManager {
     
     public func createEvents(_ event: EventsRequest, completion: @escaping (Result<EventsResponse, NetworkError>) -> Void) {
         post(
+            baseURL: logBaseURL,
             endpoint: "/v1/ecommerce/events",
             requestBody: event,
             responseType: EventsResponse.self
