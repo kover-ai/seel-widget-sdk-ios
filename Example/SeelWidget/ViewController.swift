@@ -314,11 +314,13 @@ class ViewController: UIViewController {
     }
     
     func updateViews() {
+        let _cartId = UserDefaults.standard.value(forKey: TestDatas.cartIdKey) as? String
         let _optedOperationTime = UserDefaults.standard.value(forKey: TestDatas.optedOperationTimeKey) as? TimeInterval
         let _optedValue = UserDefaults.standard.value(forKey: TestDatas.optedValueKey) as? Bool
+        let cartIdString: String = _cartId != nil ? "\(_cartId!)" : "-"
         let optedOperationTimeString: String = _optedOperationTime != nil ? formatTimeInterval(_optedOperationTime!) : "-"
         let optedValueString: String = _optedValue != nil ? "\(String(describing: _optedValue!))" : "-"
-        cacheInfoLabel.text = "Operating Time: \(optedOperationTimeString) optedIn:\(optedValueString)"
+        cacheInfoLabel.text = "CartID: \(cartIdString) \n Operating Time: \(optedOperationTimeString) \n optedIn:\(optedValueString)"
     }
     
     func formatTimeInterval(_ timeInterval: TimeInterval) -> String {

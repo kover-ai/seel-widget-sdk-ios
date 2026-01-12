@@ -105,9 +105,10 @@ public struct QuoteLineItem: Codable {
     public var category1: String?
     public var category2: String?
     public var imageURLs: [String]?
+    public var brandName: String?
     public var shippingOrigin: QuoteShippingOrigin?
     
-    public init(lineItemID: String? = nil, productID: String? = nil, variantID: String? = nil, productTitle: String? = nil, variantTitle: String? = nil, price: Double? = nil, quantity: Int? = nil, currency: String? = nil, salesTax: Double? = nil, requiresShipping: Bool? = nil, finalPrice: String? = nil, isFinalSale: Bool? = nil, allocatedDiscounts: Double? = nil, category1: String? = nil, category2: String? = nil, imageURLs: [String]? = nil, shippingOrigin: QuoteShippingOrigin? = nil) {
+    public init(lineItemID: String? = nil, productID: String? = nil, variantID: String? = nil, productTitle: String? = nil, variantTitle: String? = nil, price: Double? = nil, quantity: Int? = nil, currency: String? = nil, salesTax: Double? = nil, requiresShipping: Bool? = nil, finalPrice: String? = nil, isFinalSale: Bool? = nil, allocatedDiscounts: Double? = nil, category1: String? = nil, category2: String? = nil, imageURLs: [String]? = nil, brandName: String? = nil, shippingOrigin: QuoteShippingOrigin? = nil) {
         self.lineItemID = lineItemID
         self.productID = productID
         self.variantID = variantID
@@ -124,6 +125,7 @@ public struct QuoteLineItem: Codable {
         self.category1 = category1
         self.category2 = category2
         self.imageURLs = imageURLs
+        self.brandName = brandName
         self.shippingOrigin = shippingOrigin
     }
 
@@ -142,6 +144,7 @@ public struct QuoteLineItem: Codable {
         case category1 = "category_1"
         case category2 = "category_2"
         case imageURLs = "image_urls"
+        case brandName = "brand_name"
         case shippingOrigin = "shipping_origin"
     }
 }

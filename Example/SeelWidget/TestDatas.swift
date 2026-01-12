@@ -32,6 +32,7 @@ class TestDatas {
     static let optedValidTimeKey = "OptedValidTimeKey"
     static let optedValueKey = "Seel.OptedValueKey"
     static let optedOperationTimeKey = "Seel.OptedOperationTimeKey"
+    static let cartIdKey = "Seel.CartIdKey"
     
     static let apiKey: String = "yojct9zbwxok8961hr7e1s6i3fgmm1o1"
     
@@ -66,6 +67,7 @@ class TestDatas {
                         "https://example.com/image1",
                         "https://example.com/image2"
                     ],
+                    "brand_name": "poshmark",
                     "shipping_origin": [
                         "country": "US"
                     ]
@@ -90,6 +92,7 @@ class TestDatas {
                         "https://example.com/image1",
                         "https://example.com/image2"
                     ],
+                    "brand_name": "poshmark",
                     "shipping_origin": [
                         "country": "US"
                     ]
