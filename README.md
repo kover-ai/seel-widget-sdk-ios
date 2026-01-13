@@ -12,7 +12,7 @@
 ### Swift Package Manager (Recommended)
 
 1. In Xcode, go to **File** → **Add Package Dependencies**
-2. Enter the repository URL: `https://github.com/seel/SeelWidget.git`
+2. Enter the repository URL: `https://github.com/kover-ai/seel-widget-sdk-ios.git`
 3. Select the version you want to use
 4. Click **Add Package**
 
@@ -20,7 +20,7 @@ Alternatively, you can add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/seel/SeelWidget.git", from: "0.1.2")
+    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", from: "0.1.2")
 ]
 ```
 
