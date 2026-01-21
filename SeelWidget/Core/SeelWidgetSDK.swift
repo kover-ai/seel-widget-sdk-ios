@@ -6,6 +6,7 @@ public enum SeelEnvironment: String {
     case production = "production"
 }
 
+@MainActor
 public class SeelWidgetSDK {
     
     // MARK: - Singleton Instance
@@ -42,7 +43,7 @@ public class SeelWidgetSDK {
         return _apiKey != nil
     }
     
-    public func createEvents(_ event: EventsRequest, completion: @escaping (Result<EventsResponse, NetworkError>) -> Void) {
+    public func createEvents(_ event: EventsRequest, completion: @escaping @Sendable (Result<EventsResponse, NetworkError>) -> Void) {
         var _event = event
         _event.eventID = UUID().uuidString
         NetworkManager.shared.createEvents(_event, completion: completion)

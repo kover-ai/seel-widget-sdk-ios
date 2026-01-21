@@ -20,7 +20,7 @@ Alternatively, you can add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", from: "0.1.2")
+    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", from: "0.1.4")
 ]
 ```
 

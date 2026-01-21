@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EventsRequest: Codable {
+public struct EventsRequest: Codable, Sendable {
     
     /// Event ID
     var eventID: String?

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct QuotesRequest: Codable {
+public struct QuotesRequest: Codable, Sendable {
     /// The ID of a cart
     public var cartID: String?
     
@@ -88,7 +88,7 @@ public struct QuotesRequest: Codable {
     }
 }
 
-public struct QuoteLineItem: Codable {
+public struct QuoteLineItem: Codable, Sendable {
     public var lineItemID: String?
     public var productID: String?
     public var variantID: String?
@@ -149,7 +149,7 @@ public struct QuoteLineItem: Codable {
     }
 }
 
-public struct QuoteShippingOrigin: Codable {
+public struct QuoteShippingOrigin: Codable, Sendable {
     public var country: String?
     
     public init(country: String? = nil) {
@@ -157,7 +157,7 @@ public struct QuoteShippingOrigin: Codable {
     }
 }
 
-public struct QuoteShippingAddress: Codable {
+public struct QuoteShippingAddress: Codable, Sendable {
     public var address1: String?
     public var city: String?
     public var state: String?
@@ -178,7 +178,7 @@ public struct QuoteShippingAddress: Codable {
     }
 }
 
-public struct QuoteCustomer: Codable {
+public struct QuoteCustomer: Codable, Sendable {
     public var customerID: String?
     public var firstName: String?
     public var lastName: String?
@@ -201,7 +201,7 @@ public struct QuoteCustomer: Codable {
     }
 }
 
-public struct QuoteExtraInfo: Codable {
+public struct QuoteExtraInfo: Codable, Sendable {
     public var shippingFee: Double?
     
     public init(shippingFee: Double? = nil) {

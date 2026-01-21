@@ -1,6 +1,7 @@
 import Foundation
 
 /// Network manager responsible for encapsulating all network requests
+@MainActor
 class NetworkManager {
     
     // MARK: - Singleton
@@ -69,13 +70,13 @@ class NetworkManager {
     ///   - requestBody: Request body (Codable object)
     ///   - responseType: Response type
     ///   - completion: Completion callback
-    public func post<T: Codable, R: Codable>(
+    public func post<T: Codable, R: Codable & Sendable>(
         baseURL: String? = nil,
         timeoutInterval: TimeInterval? = nil,
         endpoint: String,
         requestBody: T,
         responseType: R.Type,
-        completion: @escaping (Result<R, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<R, NetworkError>) -> Void
     ) {
         do {
             var configuration = try createDefaultConfiguration()
@@ -110,13 +111,13 @@ class NetworkManager {
     ///   - queryParams: Query parameters (Codable object)
     ///   - responseType: Response type
     ///   - completion: Completion callback
-    public func get<T: Codable, R: Codable>(
+    public func get<T: Codable, R: Codable & Sendable>(
         baseURL: String? = nil,
         timeoutInterval: TimeInterval? = nil,
         endpoint: String,
         queryParams: T? = nil,
         responseType: R.Type,
-        completion: @escaping (Result<R, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<R, NetworkError>) -> Void
     ) {
         do {
             var configuration = try createDefaultConfiguration()
@@ -147,7 +148,7 @@ class NetworkManager {
 
 extension NetworkManager {
     
-    public func createQuote(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
+    public func createQuote(_ quote: QuotesRequest, completion: @escaping @Sendable (Result<QuotesResponse, NetworkError>) -> Void) {
         post(
             timeoutInterval: 5.0,
             endpoint: "/v1/ecommerce/quotes",
@@ -160,7 +161,7 @@ extension NetworkManager {
         }
     }
     
-    public func createEvents(_ event: EventsRequest, completion: @escaping (Result<EventsResponse, NetworkError>) -> Void) {
+    public func createEvents(_ event: EventsRequest, completion: @escaping @Sendable (Result<EventsResponse, NetworkError>) -> Void) {
         post(
             baseURL: logBaseURL,
             endpoint: "/v1/ecommerce/events",

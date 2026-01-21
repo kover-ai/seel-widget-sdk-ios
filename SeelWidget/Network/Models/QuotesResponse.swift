@@ -1,11 +1,11 @@
 import Foundation
 
-public enum QuoteStatus: String, Codable {
+public enum QuoteStatus: String, Codable, Sendable {
     case accepted = "accepted"
     case rejected = "rejected"
 }
 
-public struct QuotesResponse: Codable {
+public struct QuotesResponse: Codable, Sendable {
     public let quoteID: String?
     public let cartID: String?
     public let merchantID: String?
@@ -48,7 +48,7 @@ public struct QuotesResponse: Codable {
         case extraInfo = "extra_info"
     }
     
-    public struct LineItem: Codable {
+    public struct LineItem: Codable, Sendable {
         public let lineItemID: String?
         public let productID: String?
         public let productTitle: String?
@@ -113,7 +113,7 @@ public struct QuotesResponse: Codable {
         }
     }
 
-    public struct ShippingOrigin: Codable {
+    public struct ShippingOrigin: Codable, Sendable {
         public let address1: String?
         public let address2: String?
         public let city: String?
@@ -128,7 +128,7 @@ public struct QuotesResponse: Codable {
         }
     }
 
-    public struct EligibleItem: Codable {
+    public struct EligibleItem: Codable, Sendable {
         public let lineItemID: String?
         public let productID: String?
         public let variantID: String?
@@ -142,7 +142,7 @@ public struct QuotesResponse: Codable {
         }
     }
 
-    public struct Coverage: Codable {
+    public struct Coverage: Codable, Sendable {
         public let coverageType: String?
         public let description: String?
 
@@ -152,7 +152,7 @@ public struct QuotesResponse: Codable {
         }
     }
 
-    public struct ShippingAddress: Codable {
+    public struct ShippingAddress: Codable, Sendable {
         public let address1: String?
         public let address2: String?
         public let city: String?
@@ -167,7 +167,7 @@ public struct QuotesResponse: Codable {
         }
     }
 
-    public struct Customer: Codable {
+    public struct Customer: Codable, Sendable {
         public let customerID: String?
         public let firstName: String?
         public let lastName: String?
@@ -184,7 +184,7 @@ public struct QuotesResponse: Codable {
         }
     }
 
-    public struct ExtraInfo: Codable {
+    public struct ExtraInfo: Codable, Sendable {
         public let shippingFee: Double?
         public let termsURL: String?
         public let privacyPolicyURL: String?

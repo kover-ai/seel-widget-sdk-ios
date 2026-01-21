@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Network Request Error Types
-public enum NetworkError: Error {
+public enum NetworkError: Error, Sendable {
     case invalidURL
     case noData
     case decodingError(Error)
@@ -76,13 +76,13 @@ final class Request {
     // MARK: - Callback-based Network Request Methods
     
     /// Generic request method (callback-based)
-    public func request<T: Codable>(
+    public func request<T: Codable & Sendable>(
         url: String,
         method: HTTPMethod = .GET,
         parameters: [String: Any]? = nil,
         headers: [String: String]? = nil,
         responseType: T.Type,
-        completion: @escaping (Result<T, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<T, NetworkError>) -> Void
     ) {
         
         guard let url = URL(string: url) else {
@@ -164,12 +164,12 @@ final class Request {
     // MARK: - Convenience Methods
     
     /// GET request
-    public func get<T: Codable>(
+    public func get<T: Codable & Sendable>(
         url: String,
         parameters: [String: Any]? = nil,
         headers: [String: String]? = nil,
         responseType: T.Type,
-        completion: @escaping (Result<T, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<T, NetworkError>) -> Void
     ) {
         request(
             url: url,
@@ -182,12 +182,12 @@ final class Request {
     }
     
     /// POST request
-    public func post<T: Codable>(
+    public func post<T: Codable & Sendable>(
         url: String,
         parameters: [String: Any]? = nil,
         headers: [String: String]? = nil,
         responseType: T.Type,
-        completion: @escaping (Result<T, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<T, NetworkError>) -> Void
     ) {
         request(
             url: url,
@@ -200,12 +200,12 @@ final class Request {
     }
     
     /// PUT request
-    public func put<T: Codable>(
+    public func put<T: Codable & Sendable>(
         url: String,
         parameters: [String: Any]? = nil,
         headers: [String: String]? = nil,
         responseType: T.Type,
-        completion: @escaping (Result<T, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<T, NetworkError>) -> Void
     ) {
         request(
             url: url,
@@ -218,12 +218,12 @@ final class Request {
     }
     
     /// DELETE request
-    public func delete<T: Codable>(
+    public func delete<T: Codable & Sendable>(
         url: String,
         parameters: [String: Any]? = nil,
         headers: [String: String]? = nil,
         responseType: T.Type,
-        completion: @escaping (Result<T, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<T, NetworkError>) -> Void
     ) {
         request(
             url: url,
@@ -241,7 +241,7 @@ final class Request {
         method: HTTPMethod = .GET,
         parameters: [String: Any]? = nil,
         headers: [String: String]? = nil,
-        completion: @escaping (Result<Data, NetworkError>) -> Void
+        completion: @escaping @Sendable (Result<Data, NetworkError>) -> Void
     ) {
         
         guard let url = URL(string: url) else {

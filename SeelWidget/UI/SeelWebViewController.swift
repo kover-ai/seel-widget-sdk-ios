@@ -169,10 +169,15 @@ final class SeelWebViewController: UIViewController {
     
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
-            let progress = Float(webView.estimatedProgress)
-            progressView.setProgress(progress, animated: true)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let progress = Float(self.webView.estimatedProgress)
+                self.progressView.setProgress(progress, animated: true)
+            }
         } else if keyPath == "title" {
-            updateTitle()
+            DispatchQueue.main.async { [weak self] in
+                self?.updateTitle()
+            }
         }
     }
     

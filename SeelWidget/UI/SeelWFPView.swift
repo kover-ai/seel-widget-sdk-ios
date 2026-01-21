@@ -200,27 +200,30 @@ extension SeelWFPView {
         base.present(webViewController, animated: true)
     }
 
-    func createQuote(_ quote: QuotesRequest, isSetup: Bool, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
+    func createQuote(_ quote: QuotesRequest, isSetup: Bool, completion: @escaping @Sendable (Result<QuotesResponse, NetworkError>) -> Void) {
         loading = true
         updateViews()
         NetworkManager.shared.createQuote(quote, completion: { [weak self] result in
-            self?.loading = false
-            completion(result)
-            switch result {
-            case .success(let value):
-                self?.quoteResponse = value
-                self?.updateViews()
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.loading = false
+                completion(result)
+                switch result {
+                case .success(let value):
+                    self.quoteResponse = value
+                    self.updateViews()
 
-                var finalOptedIn = value.isDefaultOn ?? false
-                if let localOptValue = self?.localOptedIn(value.cartID) {
-                    finalOptedIn = localOptValue
+                    var finalOptedIn = value.isDefaultOn ?? false
+                    if let localOptValue = self.localOptedIn(value.cartID) {
+                        finalOptedIn = localOptValue
+                    }
+
+                    _ = self.turnOnIfNeed(finalOptedIn)
+                case .failure(_):
+                    self.quoteResponse = nil
+                    self.updateViews()
+                    _ = self.optedChanged(false)
                 }
-
-                _ = self?.turnOnIfNeed(finalOptedIn)
-            case .failure(_):
-                self?.quoteResponse = nil
-                self?.updateViews()
-                _ = self?.optedChanged(false)
             }
         })
     }
