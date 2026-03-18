@@ -55,15 +55,13 @@ public final class SeelWFPView: UIView {
         return wfpView
     }()
     
-    private lazy var switcher: SeelSwitch = {
-        let switcher = SeelSwitch()
-        switcher.onTintColor = UIColor(hex: "#2121C4")
-        switcher.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
-        switcher.isOn = true
-        switcher.onValueChanged = { [weak self] isOn in
+    private lazy var checkbox: SeelCheckbox = {
+        let checkbox = SeelCheckbox()
+        checkbox.isOn = true
+        checkbox.onValueChanged = { [weak self] isOn in
             self?.statusChanged(isOn)
         }
-        return switcher
+        return checkbox
     }()
     
     override public init(frame: CGRect) {
@@ -84,7 +82,7 @@ public final class SeelWFPView: UIView {
         contentSV.addArrangedSubview(disclaimerLabel)
         
         titleSV.addArrangedSubview(titleView)
-        titleSV.addArrangedSubview(switcher)
+        titleSV.addArrangedSubview(checkbox)
     }
     
     func configViews() {
@@ -121,7 +119,7 @@ public final class SeelWFPView: UIView {
         titleView.updateViews()
         
         // Use enum convenience methods for status checking
-        switcher.isHidden = quoteResponse == nil || isRejected
+        checkbox.isHidden = quoteResponse == nil || isRejected
         
         detailSV.isHidden = quoteResponse == nil || !isRejected
         
@@ -248,7 +246,7 @@ extension SeelWFPView {
     
     func turnOnIfNeed(_ on: Bool) -> Bool {
         let isTargetOn = optedChanged(on)
-        switcher.isOn = isTargetOn
+        checkbox.isOn = isTargetOn
         return isTargetOn
     }
     
