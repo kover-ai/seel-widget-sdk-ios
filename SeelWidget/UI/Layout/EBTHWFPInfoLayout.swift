@@ -45,7 +45,12 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         backgroundImageView.clipsToBounds = true
         backgroundImageView.image = UIImage(swName: "background_image")
         backgroundImageView.backgroundColor = UIColor(hex: "#3A3A5C")
+        backgroundImageView.transform = CGAffineTransform(scaleX: -1, y: 1)
         headerContainer.addSubview(backgroundImageView)
+        
+        let headerBlur = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        headerBlur.alpha = 0.3
+        headerContainer.addSubview(headerBlur)
         
         let seelLogoIcon = UIImageView()
         seelLogoIcon.contentMode = .scaleAspectFit
@@ -78,6 +83,9 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.height.equalTo(200)
         }
         backgroundImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        headerBlur.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         seelLogoIcon.snp.makeConstraints { make in
