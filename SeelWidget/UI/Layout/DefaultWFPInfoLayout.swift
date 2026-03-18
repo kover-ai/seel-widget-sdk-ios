@@ -14,7 +14,7 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Navigation Bar
         let navigationBar = SeelNavigationBar()
-        navigationBar.title = quoteResponse?.extraInfo?.widgetTitle ?? "What's Covered"
+        navigationBar.title = quoteResponse?.extraInfo?.widgetTitle
         
         let closeButton = UIButton(type: .custom)
         closeButton.setTitle("Close", for: .normal)
