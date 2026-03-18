@@ -37,6 +37,85 @@ class TestDatas {
     static let apiKey: String = "yojct9zbwxok8961hr7e1s6i3fgmm1o1"
     
     class func getQuote(_ accepted: Bool = true, defaultOn: Bool = true, itemCount: Int = 3, error: Bool = false) -> QuotesRequest? {
+        let ebthParams: Dictionary<String, Any> = [
+            "type": error ? "" : "ebth-wfp",
+            "cart_id": "3b87ea2a6cecdb94bae186263feb9e7f",
+            "session_id": "3b87ea2a6cecdb94bae186263feb9e7f",
+            "merchant_id": "20251219208123118426",
+            "device_id": "1737534673",
+            "device_category": "web",
+            "device_platform": "ios",
+            "is_default_on": defaultOn,
+            "line_items": [
+                [
+                    "line_item_id": "11111",
+                    "product_id": "10013-0000-319802",
+                    "variant_id": "10013-0000-319802",
+                    "product_title": "Brass Crystal Mini Table Lamp",
+                    "variant_title": "Brass Crystal Mini Table Lamp",
+                    "price": 50,
+                    "quantity": itemCount,
+                    "currency": "USD",
+                    "sales_tax": 0,
+                    "requires_shipping": true,
+                    "final_price": "50",
+                    "is_final_sale": true,
+                    "allocated_discounts": 0,
+                    "category_1": "Household Goods",
+                    "category_2": "Decor",
+                    "image_urls": [
+                        "https://example.com/image1",
+                        "https://example.com/image2"
+                    ],
+                    "shipping_origin": [
+                        "country": "US"
+                    ]
+                ],
+                [
+                    "line_item_id": "22222",
+                    "product_id": "10013-0000-319803",
+                    "variant_id": "10013-0000-319803",
+                    "product_title": "Williams Brand Allegro 2",
+                    "variant_title": "Williams Brand Allegro 2",
+                    "price": 10,
+                    "quantity": 3,
+                    "currency": "USD",
+                    "sales_tax": 6,
+                    "requires_shipping": true,
+                    "final_price": "15.00",
+                    "is_final_sale": true,
+                    "allocated_discounts": 1,
+                    "category_1": "Household Goods",
+                    "category_2": "Decor",
+                    "image_urls": [
+                        "https://example.com/image1",
+                        "https://example.com/image2"
+                    ],
+                    "shipping_origin": [
+                        "country": "US"
+                    ]
+                ]
+            ],
+            "shipping_address": [
+                "address_1": "7 Buswell Street",
+                "city": "Boston",
+                "state": "MA",
+                "zipcode": "02215",
+                "country": accepted ? "US" : "CN"
+            ],
+            "customer": [
+                "customer_id": "1111",
+                "first_name": "name",
+                "last_name": "name",
+                "email": "xie@seel.com",
+                "phone": NSNull()
+            ],
+            "extra_info": [
+                "shipping_fee": 10
+            ],
+            "lang": "en-US"
+        ]
+        
         let params: Dictionary<String, Any> = [
             "type": error ? "" : "poshmark-wfp",
             "cart_id": "3b87ea2a6cecdb94bae186263feb9e7f",
@@ -116,7 +195,7 @@ class TestDatas {
                 "shipping_fee": 10
             ]
         ]
-        if let quotes = params.toObject(QuotesRequest.self) {
+        if let quotes = ebthParams.toObject(QuotesRequest.self) {
             return quotes
         }
         return nil

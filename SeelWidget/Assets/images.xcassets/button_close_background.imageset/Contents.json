@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "button_close.png",
+      "filename" : "button_close_background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
