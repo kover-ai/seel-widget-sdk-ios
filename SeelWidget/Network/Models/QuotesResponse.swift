@@ -52,7 +52,7 @@ public struct QuotesResponse: Codable, Sendable {
         public let lineItemID: String?
         public let productID: String?
         public let productTitle: String?
-        public let productAttributes: String?
+        public let productAttributes: AnyCodable?
         public let productDescription: String?
         public let variantID: String?
         public let variantTitle: String?
@@ -78,7 +78,7 @@ public struct QuotesResponse: Codable, Sendable {
         public let category3: String?
         public let category4: String?
         public let condition: String?
-        public let extraInfo: String?
+        public let extraInfo: AnyCodable?
 
         enum CodingKeys: String, CodingKey {
             case lineItemID = "line_item_id"
