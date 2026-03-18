@@ -6,6 +6,8 @@ import SnapKit
 /// feature cards, and full-width CTA button.
 final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
     
+    var enableBlurEffect: Bool = false
+    
     var preferredPresentationStyle: UIModalPresentationStyle { .fullScreen }
     
     func buildLayout(
@@ -99,17 +101,30 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.top.equalTo(headerTitleLabel.snp.bottom).offset(4)
         }
         
-        // MARK: - White Card with Blur
-        let blurEffect = UIBlurEffect(style: .light)
-        let blurView = UIVisualEffectView(effect: blurEffect)
-        blurView.layer.cornerRadius = 20
-        blurView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        blurView.clipsToBounds = true
-        contentView.addSubview(blurView)
+        // MARK: - White Card (with optional blur)
+        let cardContainer: UIView
+        let whiteCard: UIView
         
-        let whiteCard = blurView.contentView
+        if enableBlurEffect {
+            let blurEffect = UIBlurEffect(style: .light)
+            let blurView = UIVisualEffectView(effect: blurEffect)
+            blurView.layer.cornerRadius = 10
+            blurView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            blurView.clipsToBounds = true
+            cardContainer = blurView
+            whiteCard = blurView.contentView
+        } else {
+            let plainView = UIView()
+            plainView.backgroundColor = .white
+            plainView.layer.cornerRadius = 10
+            plainView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            plainView.clipsToBounds = true
+            cardContainer = plainView
+            whiteCard = plainView
+        }
         
-        blurView.snp.makeConstraints { make in
+        contentView.addSubview(cardContainer)
+        cardContainer.snp.makeConstraints { make in
             make.top.equalTo(headerContainer.snp.bottom).offset(-20)
             make.left.right.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -125,7 +140,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         wfpTitleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(24)
-            make.left.right.equalToSuperview().inset(20)
+            make.left.right.equalToSuperview().inset(24)
         }
         
         // MARK: - Coverage Card
@@ -136,7 +151,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         coverageCard.snp.makeConstraints { make in
             make.top.equalTo(wfpTitleLabel.snp.bottom).offset(20)
-            make.left.right.equalToSuperview().inset(20)
+            make.left.right.equalToSuperview().inset(24)
         }
         
         let coverageHeaderSV = UIStackView()
@@ -146,15 +161,19 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         coverageCard.addSubview(coverageHeaderSV)
         
         let shieldIcon = UIImageView()
-        shieldIcon.image = UIImage(swName: "icon_bg_select")
+        shieldIcon.image = UIImage(swName: "accredited")
         shieldIcon.tintColor = UIColor(hex: "#1E2022")
         shieldIcon.contentMode = .scaleAspectFit
+        shieldIcon.snp.makeConstraints { make in
+            make.width.equalTo(32)
+            make.height.equalTo(32)
+        }
         coverageHeaderSV.addArrangedSubview(shieldIcon)
         
         let coverageHeaderLabel = UILabel()
         coverageHeaderLabel.text = "What's Covered"
-        coverageHeaderLabel.font = .systemFont(ofSize: 16, weight: .bold)
-        coverageHeaderLabel.textColor = UIColor(hex: "#1E2022")
+        coverageHeaderLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        coverageHeaderLabel.textColor = UIColor(hex: "#000000")
         coverageHeaderSV.addArrangedSubview(coverageHeaderLabel)
         
         shieldIcon.snp.makeConstraints { make in
@@ -162,21 +181,21 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         }
         
         coverageHeaderSV.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.left.equalToSuperview().offset(16)
-            make.right.lessThanOrEqualToSuperview().offset(-16)
+            make.top.equalToSuperview().offset(20)
+            make.left.equalToSuperview().offset(20)
+            make.right.lessThanOrEqualToSuperview().offset(-20)
         }
         
         let coverageItemsSV = UIStackView()
         coverageItemsSV.axis = .vertical
-        coverageItemsSV.spacing = 12
+        coverageItemsSV.spacing = 20
         coverageCard.addSubview(coverageItemsSV)
         
         coverageItemsSV.snp.makeConstraints { make in
-            make.top.equalTo(coverageHeaderSV.snp.bottom).offset(14)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-            make.bottom.equalToSuperview().offset(-16)
+            make.top.equalTo(coverageHeaderSV.snp.bottom).offset(20)
+            make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-20)
         }
         
         let coverageTexts = quoteResponse?.extraInfo?.coverageDetailsText ?? []
@@ -194,11 +213,11 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         featureRow.snp.makeConstraints { make in
             make.top.equalTo(coverageCard.snp.bottom).offset(16)
-            make.left.right.equalToSuperview().inset(20)
+            make.left.right.equalToSuperview().inset(24)
         }
         
         let resolutionCard = buildFeatureCard(
-            iconName: "bolt.fill",
+            iconName: "bolt",
             title: "Instant Resolution",
             detail: "Quick resolution in just a few clicks"
         )
@@ -216,8 +235,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         footerContainer.snp.makeConstraints { make in
             make.top.equalTo(featureRow.snp.bottom).offset(24)
-            make.left.right.equalToSuperview().inset(20)
-            make.bottom.equalToSuperview().offset(-20)
+            make.left.right.equalToSuperview().inset(24)
+            make.bottom.equalToSuperview().offset(-24)
         }
         
         let optInButton = UIButton(type: .custom)
@@ -290,19 +309,21 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
     
     // MARK: - Private Helpers
     
+    /// accredited icon: 24x24, left offset 0 in coverageHeaderSV → center at 12
+    /// checkIcon: 20x20, needs centerX = 12 → left offset = 2
+    /// accredited text left = 24 + 8(spacing) = 32 → label left = 32
     private func buildCoverageItem(text: String) -> UIView {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 10
-        sv.alignment = .top
+        let container = UIView()
         
         let checkIcon = UIImageView()
-        checkIcon.image = UIImage(swName: "icon_bg_select")
+        checkIcon.image = UIImage(swName: "icon_check_selected_black")
         checkIcon.tintColor = UIColor(hex: "#34C759")
         checkIcon.contentMode = .scaleAspectFit
-        sv.addArrangedSubview(checkIcon)
+        container.addSubview(checkIcon)
         
         checkIcon.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(2)
+            make.top.equalToSuperview()
             make.width.height.equalTo(20)
         }
         
@@ -314,15 +335,15 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             let attr = NSMutableAttributedString(
                 string: parts[0],
                 attributes: [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .bold),
-                    .foregroundColor: UIColor(hex: "#1E2022")
+                    .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
+                    .foregroundColor: UIColor(hex: "#000000")
                 ]
             )
             attr.append(NSAttributedString(
                 string: " - " + parts.dropFirst().joined(separator: " - "),
                 attributes: [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .regular),
-                    .foregroundColor: UIColor(hex: "#565656")
+                    .font: UIFont.systemFont(ofSize: 14, weight: .medium),
+                    .foregroundColor: UIColor(hex: "#000000")
                 ]
             ))
             label.attributedText = attr
@@ -332,27 +353,34 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
                 let attr = NSMutableAttributedString(
                     string: dashParts[0],
                     attributes: [
-                        .font: UIFont.systemFont(ofSize: 14, weight: .bold),
-                        .foregroundColor: UIColor(hex: "#1E2022")
+                        .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
+                        .foregroundColor: UIColor(hex: "#000000")
                     ]
                 )
                 attr.append(NSAttributedString(
                     string: " – " + dashParts.dropFirst().joined(separator: " – "),
                     attributes: [
-                        .font: UIFont.systemFont(ofSize: 14, weight: .regular),
-                        .foregroundColor: UIColor(hex: "#565656")
+                        .font: UIFont.systemFont(ofSize: 14, weight: .medium),
+                        .foregroundColor: UIColor(hex: "#000000")
                     ]
                 ))
                 label.attributedText = attr
             } else {
                 label.text = text
                 label.font = .systemFont(ofSize: 14)
-                label.textColor = UIColor(hex: "#1E2022")
+                label.textColor = UIColor(hex: "#000000")
             }
         }
         
-        sv.addArrangedSubview(label)
-        return sv
+        container.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(32)
+            make.top.equalToSuperview()
+            make.right.equalToSuperview()
+            make.bottom.equalToSuperview()
+        }
+        
+        return container
     }
     
     private func buildFeatureCard(iconName: String, title: String, detail: String) -> UIView {
@@ -361,9 +389,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         card.layer.cornerRadius = 10
         
         let iconView = UIImageView()
-        if #available(iOS 13.0, *) {
-            iconView.image = UIImage(systemName: iconName)
-        }
+        iconView.image = UIImage(swName: iconName)
         iconView.tintColor = UIColor(hex: "#000000")
         iconView.contentMode = .scaleAspectFit
         card.addSubview(iconView)
@@ -383,17 +409,17 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         card.addSubview(detailLabel)
         
         iconView.snp.makeConstraints { make in
-            make.top.left.equalToSuperview().offset(14)
-            make.width.height.equalTo(22)
+            make.top.left.equalToSuperview().offset(20)
+            make.width.height.equalTo(32)
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(iconView.snp.bottom).offset(10)
-            make.left.right.equalToSuperview().inset(14)
+            make.left.right.equalToSuperview().inset(20)
         }
         detailLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(4)
-            make.left.right.equalToSuperview().inset(14)
-            make.bottom.equalToSuperview().offset(-14)
+            make.left.right.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview().offset(-20)
         }
         
         return card
