@@ -36,6 +36,15 @@ public final class SeelWFPView: UIView {
         return sv
     }()
     
+    private lazy var disclaimerLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 11, weight: .regular)
+        label.textColor = UIColor(hex: "#808692")
+        label.numberOfLines = 0
+        label.isHidden = true
+        return label
+    }()
+    
     private lazy var titleView: SeelWFPTitleView = {
         let wfpView = SeelWFPTitleView()
         wfpView.infoClicked = { [weak self] in
@@ -72,6 +81,7 @@ public final class SeelWFPView: UIView {
         addSubview(contentSV)
         contentSV.addArrangedSubview(titleSV)
         contentSV.addArrangedSubview(detailSV)
+        contentSV.addArrangedSubview(disclaimerLabel)
         
         titleSV.addArrangedSubview(titleView)
         titleSV.addArrangedSubview(switcher)
@@ -137,6 +147,13 @@ public final class SeelWFPView: UIView {
                 view.isHidden = true
             }
         }
+        
+        if let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer, !disclaimer.isEmpty {
+            disclaimerLabel.text = disclaimer
+            disclaimerLabel.isHidden = false
+        } else {
+            disclaimerLabel.isHidden = true
+        }
     }
     
 }
@@ -159,8 +176,9 @@ extension SeelWFPView {
         if let viewController = self.parentViewController,
            quoteResponse != nil
         {
-            let infoViewController = SeelWFPInfoViewController(quoteResponse: quoteResponse)
-            infoViewController.modalPresentationStyle = .overFullScreen
+            let infoViewController = SeelWFPInfoViewController(quoteResponse: quoteResponse, brandType: quoteResponse?.type)
+            let layoutProvider = WFPInfoLayoutFactory.provider(for: quoteResponse?.type)
+            infoViewController.modalPresentationStyle = layoutProvider.preferredPresentationStyle
             infoViewController.optedInClicked = { [weak self] in
                 self?.updateLocalOptedIn(true)
                 _ = self?.turnOnIfNeed(true)

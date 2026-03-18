@@ -191,7 +191,9 @@ public struct QuotesResponse: Codable, Sendable {
         public let displayWidgetText: [String]?
         public let coverageDetailsText: [String]?
         public let optOutWarningText: String?
+        public let widgetDisclaimer: String?
         public let widgetTitle: String?
+        public let optedOut: Bool?
 
         enum CodingKeys: String, CodingKey {
             case shippingFee = "shipping_fee"
@@ -200,7 +202,9 @@ public struct QuotesResponse: Codable, Sendable {
             case displayWidgetText = "display_widget_text"
             case coverageDetailsText = "coverage_details_text"
             case optOutWarningText = "opt_out_warning_text"
+            case widgetDisclaimer = "widget_disclaimer"
             case widgetTitle = "widget_title"
+            case optedOut = "opted_out"
         }
     }
     

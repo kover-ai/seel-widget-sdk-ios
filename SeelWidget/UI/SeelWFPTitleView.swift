@@ -49,7 +49,7 @@ final class SeelWFPTitleView: UIView {
     
     private lazy var seelIcon = UIImageView(image: UIImage(swName: "seel_icon"))
     private lazy var titleLabel = UILabel(frame: .zero)
-    private lazy var priceLable = UILabel(frame: .zero)
+    private lazy var priceLabel = UILabel(frame: .zero)
     private lazy var animationView = LoadingAnimationView(frame: .init(x: 0, y: 0, width: 30, height: 11))
     
     private lazy var infoButton: UIButton = {
@@ -87,7 +87,7 @@ final class SeelWFPTitleView: UIView {
         textSV.addArrangedSubview(detailSV)
         
         titleSV.addArrangedSubview(titleLabel)
-        titleSV.addArrangedSubview(priceLable)
+        titleSV.addArrangedSubview(priceLabel)
         titleSV.addArrangedSubview(animationView)
         titleSV.addArrangedSubview(infoButton)
         
@@ -101,9 +101,9 @@ final class SeelWFPTitleView: UIView {
         titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
         titleLabel.textColor = UIColor(hex: "#000000")
         
-        priceLable.text = "for -"
-        priceLable.font = UIFont.systemFont(ofSize: 10, weight: .regular)
-        priceLable.textColor = UIColor(hex: "#000000")
+        priceLabel.text = "for -"
+        priceLabel.font = UIFont.systemFont(ofSize: 10, weight: .regular)
+        priceLabel.textColor = UIColor(hex: "#000000")
         
         poweredLabel.text = "Powered by"
         poweredLabel.font = UIFont.systemFont(ofSize: 7.5, weight: .semibold)
@@ -132,13 +132,13 @@ final class SeelWFPTitleView: UIView {
     func updateViews() {
         titleLabel.text = title
         
-        priceLable.isHidden = price == nil && !loading
+        priceLabel.isHidden = price == nil && !loading
         animationView.isHidden = !loading
         if loading {
-            priceLable.text = "for"
+            priceLabel.text = "for"
             animationView.startAnimating()
         } else {
-            priceLable.text = "for $\(String(describing: price ?? 0))"
+            priceLabel.text = "for $\(String(describing: price ?? 0))"
             animationView.stopAnimating()
         }
         
