@@ -99,14 +99,17 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.top.equalTo(headerTitleLabel.snp.bottom).offset(4)
         }
         
-        // MARK: - White Card
-        let whiteCard = UIView()
-        whiteCard.backgroundColor = .white
-        whiteCard.layer.cornerRadius = 20
-        whiteCard.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        contentView.addSubview(whiteCard)
+        // MARK: - White Card with Blur
+        let blurEffect = UIBlurEffect(style: .light)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.layer.cornerRadius = 20
+        blurView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        blurView.clipsToBounds = true
+        contentView.addSubview(blurView)
         
-        whiteCard.snp.makeConstraints { make in
+        let whiteCard = blurView.contentView
+        
+        blurView.snp.makeConstraints { make in
             make.top.equalTo(headerContainer.snp.bottom).offset(-20)
             make.left.right.equalToSuperview()
             make.bottom.equalToSuperview()
