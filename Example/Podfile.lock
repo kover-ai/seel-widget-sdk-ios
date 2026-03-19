@@ -1,5 +1,5 @@
 PODS:
-  - SeelWidget (0.1.8):
+  - SeelWidget (0.1.10):
     - SnapKit (~> 5.6.0)
   - SnapKit (5.6.0)
 
@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  SeelWidget: cc4dbe8a2da81c59caab12998d07cdeb1ad36ca6
+  SeelWidget: df78779bf16a9767cc52c246fcf0a0049e7f6be1
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
 PODFILE CHECKSUM: babd2de01e8d1cf7dc0fba8df01c2d2f2c14c328
