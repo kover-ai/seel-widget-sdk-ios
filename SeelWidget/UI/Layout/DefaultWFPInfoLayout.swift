@@ -70,7 +70,8 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Constraints
         navigationBar.snp.makeConstraints { make in
-            make.top.left.right.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.left.right.equalToSuperview()
         }
         backgroundView.snp.makeConstraints { make in
             make.bottom.left.right.equalToSuperview()
@@ -102,11 +103,12 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
             make.right.equalToSuperview().offset(-30)
             make.top.equalTo(coverageDetailsView.snp.bottom).offset(20)
         }
+        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
         coverageInfoFooter.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
             make.top.equalTo(coverageTipsView.snp.bottom).offset(20)
-            make.bottom.equalToSuperview().offset(-18)
+            make.bottom.equalToSuperview().offset(-(18 + bottomInset))
         }
     }
 }

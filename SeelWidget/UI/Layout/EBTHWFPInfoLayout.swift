@@ -78,9 +78,10 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         headerSubtitleLabel.numberOfLines = 0
         headerContainer.addSubview(headerSubtitleLabel)
         
+        let headerHeight = max(200, UIScreen.main.bounds.height * 0.22)
         headerContainer.snp.makeConstraints { make in
             make.top.left.right.equalToSuperview()
-            make.height.equalTo(200)
+            make.height.equalTo(headerHeight)
         }
         backgroundImageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -88,8 +89,9 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         headerBlur.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        let topInset = UIApplication.shared.windows.first?.safeAreaInsets.top ?? 44
         seelLogoIcon.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(54)
+            make.top.equalToSuperview().offset(topInset + 10)
             make.left.equalToSuperview().offset(20)
             make.width.equalTo(80)
             make.height.equalTo(22)
