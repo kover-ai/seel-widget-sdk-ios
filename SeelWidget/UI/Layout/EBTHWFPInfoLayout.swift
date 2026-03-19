@@ -172,10 +172,6 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         shieldIcon.image = UIImage(swName: "accredited")
         shieldIcon.tintColor = UIColor(hex: "#1E2022")
         shieldIcon.contentMode = .scaleAspectFit
-        shieldIcon.snp.makeConstraints { make in
-            make.width.equalTo(32)
-            make.height.equalTo(32)
-        }
         coverageHeaderSV.addArrangedSubview(shieldIcon)
         
         let coverageHeaderLabel = UILabel()
@@ -185,7 +181,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         coverageHeaderSV.addArrangedSubview(coverageHeaderLabel)
         
         shieldIcon.snp.makeConstraints { make in
-            make.width.height.equalTo(24)
+            make.width.height.equalTo(32)
         }
         
         coverageHeaderSV.snp.makeConstraints { make in
@@ -317,9 +313,9 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
     
     // MARK: - Private Helpers
     
-    /// accredited icon: 24x24, left offset 0 in coverageHeaderSV → center at 12
-    /// checkIcon: 20x20, needs centerX = 12 → left offset = 2
-    /// accredited text left = 24 + 8(spacing) = 32 → label left = 32
+    /// accredited: 32x32, left=0 in coverageHeaderSV, center=16, text left=40
+    /// checkIcon: 20x20, left=7, center=17 (~aligned with accredited center 16)
+    /// label left=40 (aligned with coverageHeaderLabel), gap=40-27=13
     private func buildCoverageItem(text: String) -> UIView {
         let container = UIView()
         
@@ -328,12 +324,6 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         checkIcon.tintColor = UIColor(hex: "#34C759")
         checkIcon.contentMode = .scaleAspectFit
         container.addSubview(checkIcon)
-        
-        checkIcon.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(2)
-            make.top.equalToSuperview()
-            make.width.height.equalTo(20)
-        }
         
         let label = UILabel()
         label.numberOfLines = 0
@@ -382,10 +372,18 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         container.addSubview(label)
         label.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(32)
+            make.left.equalToSuperview().offset(40)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+        
+        let font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        let firstLineCenter = font.ascender / 2
+        checkIcon.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(7)
+            make.centerY.equalTo(label.snp.top).offset(firstLineCenter)
+            make.width.height.equalTo(20)
         }
         
         return container
