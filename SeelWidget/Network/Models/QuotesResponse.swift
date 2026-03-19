@@ -23,6 +23,7 @@ public struct QuotesResponse: Codable, Sendable {
     public let createdTS: String?
     public let lineItems: [LineItem]?
     public let eligibleItems: [EligibleItem]?
+    public let coverages: [Coverage]?
     public let shippingAddress: ShippingAddress?
     public let customer: Customer?
     public let extraInfo: ExtraInfo?
@@ -43,6 +44,7 @@ public struct QuotesResponse: Codable, Sendable {
         case createdTS = "created_ts"
         case lineItems = "line_items"
         case eligibleItems = "eligible_items"
+        case coverages
         case shippingAddress = "shipping_address"
         case customer
         case extraInfo = "extra_info"
@@ -145,10 +147,18 @@ public struct QuotesResponse: Codable, Sendable {
     public struct Coverage: Codable, Sendable {
         public let coverageType: String?
         public let description: String?
+        public let price: Double?
+        public let salesTax: Double?
+        public let eligibleItems: [EligibleItem]?
+        public let extraInfo: AnyCodable?
 
         enum CodingKeys: String, CodingKey {
             case coverageType = "coverage_type"
             case description
+            case price
+            case salesTax = "sales_tax"
+            case eligibleItems = "eligible_items"
+            case extraInfo = "extra_info"
         }
     }
 
@@ -173,7 +183,7 @@ public struct QuotesResponse: Codable, Sendable {
         public let lastName: String?
         public let email: String?
         public let phone: String?
-        public let extraInfo: String?
+        public let extraInfo: AnyCodable?
 
         enum CodingKeys: String, CodingKey {
             case customerID = "customer_id"

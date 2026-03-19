@@ -58,9 +58,10 @@ class TestDatas {
                     "currency": "USD",
                     "sales_tax": 0,
                     "requires_shipping": true,
-                    "final_price": "50",
+                    "final_price": 50.0,
                     "is_final_sale": true,
                     "allocated_discounts": 0,
+                    "condition": "used",
                     "category_1": "Household Goods",
                     "category_2": "Decor",
                     "image_urls": [
@@ -69,6 +70,13 @@ class TestDatas {
                     ],
                     "shipping_origin": [
                         "country": "US"
+                    ],
+                    "extra_info": [
+                        "weight_lb": 5.0,
+                        "free_return_eligible": true,
+                        "length_cm": 30.0,
+                        "width_cm": 20.0,
+                        "height_cm": 15.0
                     ]
                 ],
                 [
@@ -82,9 +90,10 @@ class TestDatas {
                     "currency": "USD",
                     "sales_tax": 6,
                     "requires_shipping": true,
-                    "final_price": "15.00",
+                    "final_price": 15.0,
                     "is_final_sale": true,
                     "allocated_discounts": 1,
+                    "condition": "used",
                     "category_1": "Household Goods",
                     "category_2": "Decor",
                     "image_urls": [
@@ -93,6 +102,13 @@ class TestDatas {
                     ],
                     "shipping_origin": [
                         "country": "US"
+                    ],
+                    "extra_info": [
+                        "weight_lb": 12.0,
+                        "free_return_eligible": false,
+                        "length_cm": 100.0,
+                        "width_cm": 40.0,
+                        "height_cm": 80.0
                     ]
                 ]
             ],
@@ -111,9 +127,9 @@ class TestDatas {
                 "phone": NSNull()
             ],
             "extra_info": [
-                "shipping_fee": 10
-            ],
-            "lang": "en-US"
+                "shipping_fee": 10,
+                "shipping_method": "standard"
+            ]
         ]
         
         let params: Dictionary<String, Any> = [
@@ -137,9 +153,10 @@ class TestDatas {
                     "currency": "USD",
                     "sales_tax": 0,
                     "requires_shipping": true,
-                    "final_price": "50",
+                    "final_price": 50.0,
                     "is_final_sale": true,
                     "allocated_discounts": 0,
+                    "condition": "new",
                     "category_1": "Household Goods",
                     "category_2": "Decor",
                     "image_urls": [
@@ -162,9 +179,10 @@ class TestDatas {
                     "currency": "USD",
                     "sales_tax": 6,
                     "requires_shipping": true,
-                    "final_price": "15.00",
+                    "final_price": 15.0,
                     "is_final_sale": true,
                     "allocated_discounts": 1,
+                    "condition": "new",
                     "category_1": "Household Goods",
                     "category_2": "Decor",
                     "image_urls": [
@@ -192,7 +210,8 @@ class TestDatas {
                 "phone": NSNull()
             ],
             "extra_info": [
-                "shipping_fee": 10
+                "shipping_fee": 10,
+                "shipping_method": "standard"
             ]
         ]
         if let quotes = ebthParams.toObject(QuotesRequest.self) {
