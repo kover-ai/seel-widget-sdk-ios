@@ -8,7 +8,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
     
     var enableBlurEffect: Bool = false
     
-    var preferredPresentationStyle: UIModalPresentationStyle { .fullScreen }
+    var preferredPresentationStyle: UIModalPresentationStyle { .overFullScreen }
     
     func buildLayout(
         in viewController: UIViewController,
@@ -16,7 +16,38 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         actions: WFPInfoLayoutActions
     ) {
         let view = viewController.view!
-        view.backgroundColor = UIColor(hex: "#F5F5F7")
+        view.backgroundColor = .clear
+        
+        // MARK: - Dim overlay (tap to close)
+        let dimOverlay = UIView()
+        dimOverlay.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        view.addSubview(dimOverlay)
+        
+        let overlayTap = UITapGestureRecognizer()
+        dimOverlay.addGestureRecognizer(overlayTap)
+        let overlayTarget = ClosureTarget { actions.onClose() }
+        overlayTap.addTarget(overlayTarget, action: #selector(ClosureTarget.invoke))
+        objc_setAssociatedObject(dimOverlay, "overlayTarget", overlayTarget, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        
+        dimOverlay.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        // MARK: - Bottom sheet container
+        let sheetContainer = UIView()
+        sheetContainer.backgroundColor = UIColor(hex: "#F5F5F7")
+        sheetContainer.layer.cornerRadius = 16
+        sheetContainer.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        sheetContainer.clipsToBounds = true
+        view.addSubview(sheetContainer)
+        
+        let topOffset = UIApplication.shared.windows.first?.safeAreaInsets.top ?? 44
+        let sheetTopMargin = topOffset + 40
+        
+        sheetContainer.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(sheetTopMargin)
+            make.left.right.bottom.equalToSuperview()
+        }
         
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = true
@@ -25,7 +56,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         let contentView = UIView()
         
-        view.addSubview(scrollView)
+        sheetContainer.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
         scrollView.snp.makeConstraints { make in
@@ -33,7 +64,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         }
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.width.equalTo(view)
+            make.width.equalTo(sheetContainer)
         }
         
         // MARK: - Header (background image + logo + close + titles)
@@ -78,7 +109,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         headerSubtitleLabel.numberOfLines = 0
         headerContainer.addSubview(headerSubtitleLabel)
         
-        let headerHeight = max(200, UIScreen.main.bounds.height * 0.22)
+        let headerHeight = max(180, UIScreen.main.bounds.height * 0.20)
         headerContainer.snp.makeConstraints { make in
             make.top.left.right.equalToSuperview()
             make.height.equalTo(headerHeight)
@@ -89,9 +120,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         headerBlur.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        let topInset = UIApplication.shared.windows.first?.safeAreaInsets.top ?? 44
         seelLogoIcon.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(topInset + 10)
+            make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
             make.width.equalTo(80)
             make.height.equalTo(22)
@@ -239,10 +269,11 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let footerContainer = UIView()
         whiteCard.addSubview(footerContainer)
         
+        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
         footerContainer.snp.makeConstraints { make in
             make.top.equalTo(featureRow.snp.bottom).offset(24)
             make.left.right.equalToSuperview().inset(24)
-            make.bottom.equalToSuperview().offset(-24)
+            make.bottom.equalToSuperview().offset(-(24 + bottomInset))
         }
         
         let optInButton = UIButton(type: .custom)

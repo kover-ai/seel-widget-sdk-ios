@@ -3,6 +3,11 @@ import SnapKit
 
 public typealias WFPOptedIn = (_ optedIn: Bool, _ quote: QuotesResponse?) -> Void
 
+public enum ToggleStyle {
+    case switchStyle
+    case checkboxStyle
+}
+
 public final class SeelWFPView: UIView {
     
     /// Opted Valid Time
@@ -10,151 +15,59 @@ public final class SeelWFPView: UIView {
     /// Default is 365 days
     public static var optedValidTime: TimeInterval = 365 * 24 * 3600
     
+    /// Toggle style: .switchStyle (default) or .checkboxStyle
+    public static var toggleStyle: ToggleStyle = .switchStyle
+    
     public var optedIn: WFPOptedIn?
     
     private var loading: Bool = false
     private var quoteResponse: QuotesResponse?
-    
-    private lazy var contentSV: UIStackView = {
-        let sv = UIStackView(frame: .zero)
-        sv.axis = .vertical
-        sv.spacing = 6
-        return sv
-    }()
-    
-    private lazy var titleSV: UIStackView = {
-        let sv = UIStackView(frame: .zero)
-        sv.axis = .horizontal
-        sv.distribution = .equalSpacing
-        return sv
-    }()
-    
-    private lazy var detailSV: UIStackView = {
-        let sv = UIStackView(frame: .zero)
-        sv.axis = .vertical
-        sv.spacing = 6
-        return sv
-    }()
-    
-    private lazy var disclaimerLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 11, weight: .regular)
-        label.textColor = UIColor(hex: "#808692")
-        label.numberOfLines = 0
-        label.isHidden = true
-        return label
-    }()
-    
-    private lazy var titleView: SeelWFPTitleView = {
-        let wfpView = SeelWFPTitleView()
-        wfpView.infoClicked = { [weak self] in
-            self?.displayInfo()
-        }
-        wfpView.showPowered = true
-        wfpView.showInfo = false
-        return wfpView
-    }()
-    
-    private lazy var checkbox: SeelCheckbox = {
-        let checkbox = SeelCheckbox()
-        checkbox.isOn = true
-        checkbox.onValueChanged = { [weak self] isOn in
-            self?.statusChanged(isOn)
-        }
-        return checkbox
-    }()
+    private var toggleIsOn: Bool = true
+    private var layoutProvider: WFPWidgetLayoutProvider?
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        createViews()
-        configViews()
-        updateViews()
+        backgroundColor = .white
+        buildDefaultLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func createViews() {
-        addSubview(contentSV)
-        contentSV.addArrangedSubview(titleSV)
-        contentSV.addArrangedSubview(detailSV)
-        contentSV.addArrangedSubview(disclaimerLabel)
-        
-        titleSV.addArrangedSubview(titleView)
-        titleSV.addArrangedSubview(checkbox)
+    /// Build the initial layout with default provider (before quote response is available).
+    private func buildDefaultLayout() {
+        rebuildLayout(brandType: nil)
     }
     
-    func configViews() {
-        backgroundColor = .white
+    /// Tear down existing layout and rebuild with the correct provider for the given brandType.
+    private func rebuildLayout(brandType: String?) {
+        subviews.forEach { $0.removeFromSuperview() }
         
-        contentSV.snp.makeConstraints { make in
-            make.edges.equalTo(UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
-        }
+        let provider = WFPWidgetLayoutFactory.provider(for: brandType)
+        self.layoutProvider = provider
+        
+        provider.buildLayout(in: self, actions: WFPWidgetLayoutActions(
+            onInfoTapped: { [weak self] in self?.displayInfo() },
+            onToggleChanged: { [weak self] isOn in self?.statusChanged(isOn) },
+            onDisabledTapped: { [weak self] in self?.showDisabledTooltip() }
+        ))
+        
+        refreshLayout()
     }
     
-    func updateViews() {
-        let displayView = quoteResponse != nil
-        
-        isHidden = !displayView
-        for subviews in contentSV.arrangedSubviews {
-            subviews.isHidden = !displayView
-        }
-        contentSV.snp.remakeConstraints({ make in
-            if displayView {
-                make.edges.equalTo(UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
-            } else {
-                make.edges.equalTo(UIEdgeInsets.zero)
-            }
-        })
-        
-        let isRejected = quoteResponse?.status == .rejected
-        
-        alpha = isRejected ? 0.9 : 1
-        
-        titleView.title = quoteResponse?.extraInfo?.widgetTitle
-        titleView.price = isRejected ? nil : quoteResponse?.price
-        titleView.showInfo = !isRejected && quoteResponse != nil
-        titleView.loading = loading
-        titleView.updateViews()
-        
-        // Use enum convenience methods for status checking
-        checkbox.isHidden = quoteResponse == nil || isRejected
-        
-        detailSV.isHidden = quoteResponse == nil || !isRejected
-        
-        let msgs: [String] = quoteResponse?.extraInfo?.displayWidgetText ?? []
-        
-        detailSV.isHidden = msgs.count <= 0
-        
-        let deltaCount = msgs.count - detailSV.arrangedSubviews.count
-        if deltaCount > 0 {
-            for _ in 0...deltaCount {
-                detailSV.addArrangedSubview(LineView(frame: .zero))
-            }
-        }
-        for (index, view) in detailSV.arrangedSubviews.enumerated() {
-            if index < msgs.count {
-                view.isHidden = false
-                if let lineView = view as? LineView {
-                    lineView.iconImage = msgs.count > 1 ? UIImage(swName: "icon_select") : nil
-                    lineView.content = msgs[index]
-                    lineView.updateViews()
-                }
-            } else {
-                view.isHidden = true
-            }
-        }
-        
-        if let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer, !disclaimer.isEmpty {
-            disclaimerLabel.text = disclaimer
-            disclaimerLabel.isHidden = false
-        } else {
-            disclaimerLabel.isHidden = true
-        }
+    /// Push current state to the layout provider for rendering.
+    private func refreshLayout() {
+        layoutProvider?.updateLayout(in: self, data: WFPWidgetLayoutData(
+            quoteResponse: quoteResponse,
+            loading: loading,
+            toggleStyle: SeelWFPView.toggleStyle,
+            toggleIsOn: toggleIsOn
+        ))
     }
-    
 }
+
+// MARK: - Public API
 
 extension SeelWFPView {
     
@@ -165,8 +78,9 @@ extension SeelWFPView {
     public func updateWidgetWhenChanged(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
         createQuote(quote, isSetup: false, completion: completion)
     }
-
 }
+
+// MARK: - Actions & Business Logic
 
 extension SeelWFPView {
     
@@ -205,7 +119,13 @@ extension SeelWFPView {
         }
     }
     
+    func showDisabledTooltip() {
+        guard let window = self.window else { return }
+        SeelTooltipView.show(in: window, anchorView: self, quoteResponse: quoteResponse)
+    }
+    
     func statusChanged(_ isOn: Bool) {
+        toggleIsOn = isOn
         updateLocalOptedIn(isOn)
         _ = optedChanged(isOn)
     }
@@ -218,7 +138,7 @@ extension SeelWFPView {
 
     func createQuote(_ quote: QuotesRequest, isSetup: Bool, completion: @escaping @Sendable (Result<QuotesResponse, NetworkError>) -> Void) {
         loading = true
-        updateViews()
+        refreshLayout()
         NetworkManager.shared.createQuote(quote, completion: { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -226,8 +146,14 @@ extension SeelWFPView {
                 completion(result)
                 switch result {
                 case .success(let value):
+                    let previousType = self.quoteResponse?.type
                     self.quoteResponse = value
-                    self.updateViews()
+                    
+                    if value.type != previousType {
+                        self.rebuildLayout(brandType: value.type)
+                    } else {
+                        self.refreshLayout()
+                    }
 
                     var finalOptedIn = value.isDefaultOn ?? false
                     if let localOptValue = self.localOptedIn(value.cartID) {
@@ -237,7 +163,7 @@ extension SeelWFPView {
                     _ = self.turnOnIfNeed(finalOptedIn)
                 case .failure(_):
                     self.quoteResponse = nil
-                    self.updateViews()
+                    self.refreshLayout()
                     _ = self.optedChanged(false)
                 }
             }
@@ -246,7 +172,8 @@ extension SeelWFPView {
     
     func turnOnIfNeed(_ on: Bool) -> Bool {
         let isTargetOn = optedChanged(on)
-        checkbox.isOn = isTargetOn
+        toggleIsOn = isTargetOn
+        refreshLayout()
         return isTargetOn
     }
     
@@ -270,8 +197,9 @@ extension SeelWFPView {
         }
         return isTargetOn
     }
-    
 }
+
+// MARK: - Local Opted State Persistence
 
 extension SeelWFPView {
     
@@ -300,6 +228,4 @@ extension SeelWFPView {
         }
         return UserDefaults.standard.value(forKey: Constants.optedValueKey) as? Bool
     }
-    
-    
 }
