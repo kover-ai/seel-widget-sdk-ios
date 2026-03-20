@@ -404,4 +404,6 @@ func setup(type: String?, style: PDPBannerStyle = PDPBannerStyle())
 
 ---
 
+> **Important**: All required fields in `QuotesRequest` (e.g. `sessionID`, `lineItems`, `shippingAddress`, `customer`) are non-optional. If the data used to construct `QuotesRequest` comes from a network API, make sure to validate the data and handle errors properly (e.g. using `do-catch`) before constructing the request object. Missing required fields will cause a decoding error or a compile-time error, depending on how the object is constructed.
+
 **Note**: Please ensure you use the correct API Key and environment settings in production.
