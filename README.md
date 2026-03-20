@@ -20,7 +20,7 @@ Alternatively, you can add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", exact: "0.1.12")
+    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", exact: "0.1.14")
 ]
 ```
 
@@ -29,7 +29,7 @@ dependencies: [
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'SeelWidget'
+pod 'SeelWidget', '0.1.14'
 ```
 
 Then run:
@@ -37,6 +37,8 @@ Then run:
 ```bash
 pod install
 ```
+
+> **Note**: After running `pod install`, open the `.xcworkspace` file (not `.xcodeproj`) to build your project.
 
 ### Manual Installation
 
@@ -214,6 +216,46 @@ wfpView.optedIn = { optedIn, quote in
 
 ```
 
+### SeelPDPBannerView Component
+
+The `SeelPDPBannerView` displays a lightweight banner on the Product Detail Page (e.g. "Worry-Free Purchase® available with seel").
+
+#### Basic Usage
+
+```swift
+import SeelWidget
+
+let pdpBanner = SeelPDPBannerView(frame: .zero)
+view.addSubview(pdpBanner)
+
+// Configure with brand type
+pdpBanner.setup(type: "ebth-wfp")
+```
+
+#### Custom Style
+
+Use `PDPBannerStyle` to customize appearance:
+
+```swift
+pdpBanner.setup(type: "ebth-wfp", style: PDPBannerStyle(
+    backgroundColor: .white,
+    padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12),
+    cornerRadius: 6,
+    borderColor: UIColor(hex: "#E0E0E0"),
+    borderWidth: 1
+))
+```
+
+#### PDPBannerStyle Properties
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `backgroundColor` | `UIColor` | `.white` | Background color |
+| `padding` | `UIEdgeInsets` | `.zero` | Inner padding |
+| `cornerRadius` | `CGFloat` | `0` | Corner radius |
+| `borderColor` | `UIColor?` | `nil` | Border color |
+| `borderWidth` | `CGFloat` | `0` | Border width |
+
 ### Event Tracking
 
 #### Send Events
@@ -280,6 +322,15 @@ func updateWidgetWhenChanged(_ request: QuotesRequest, completion: @escaping (Re
 ```swift
 // User choice callback
 var optedIn: WFPOptedIn?
+```
+
+### SeelPDPBannerView
+
+#### Methods
+
+```swift
+// Configure the banner with brand type and optional style
+func setup(type: String?, style: PDPBannerStyle = PDPBannerStyle())
 ```
 
 ### Request Field Reference
