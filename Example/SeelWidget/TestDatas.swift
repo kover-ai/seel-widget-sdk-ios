@@ -43,8 +43,8 @@ class TestDatas {
             "session_id": "3b87ea2a6cecdb94bae186263feb9e7f",
             "merchant_id": "20251219208123118426",
             "device_id": "1737534673",
-            "device_category": "web",
-            "device_platform": "ios",
+            "device_category": "mobile",
+            "device_platform": "iOS",
             "is_default_on": defaultOn,
             "line_items": [
                 [
@@ -138,8 +138,8 @@ class TestDatas {
             "session_id": "3b87ea2a6cecdb94bae186263feb9e7f",
             "merchant_id": "20251022203385298661",
             "device_id": "1737534673",
-            "device_category": "web",
-            "device_platform": "ios",
+            "device_category": "mobile",
+            "device_platform": "iOS",
             "is_default_on": defaultOn,
             "line_items": [
                 [
