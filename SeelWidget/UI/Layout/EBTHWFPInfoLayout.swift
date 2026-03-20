@@ -120,13 +120,13 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         seelLogoIcon.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(24)
             make.left.equalToSuperview().offset(24)
-            make.width.equalTo(80)
+            make.width.equalTo(78)
             make.height.equalTo(22)
         }
         closeButton.snp.makeConstraints { make in
             make.centerY.equalTo(seelLogoIcon)
             make.right.equalToSuperview().offset(-24)
-            make.width.height.equalTo(30)
+            make.width.height.equalTo(26)
         }
         headerTitleLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(24)
@@ -210,6 +210,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         coverageHeaderLabel.textColor = UIColor(hex: "#000000")
         coverageHeaderSV.addArrangedSubview(coverageHeaderLabel)
         
+        shieldIcon.setContentHuggingPriority(.required, for: .vertical)
+        shieldIcon.setContentCompressionResistancePriority(.required, for: .vertical)
         shieldIcon.snp.makeConstraints { make in
             make.width.height.equalTo(32)
         }
@@ -217,7 +219,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         coverageHeaderSV.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
-            make.right.lessThanOrEqualToSuperview().offset(-20)
+            make.right.equalToSuperview().offset(-20)
+            make.height.equalTo(32)
         }
         
         let coverageItemsSV = UIStackView()
