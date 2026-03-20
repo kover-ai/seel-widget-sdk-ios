@@ -6,10 +6,12 @@
       "scale" : "1x"
     },
     {
+      "filename" : "seel_logo@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "seel_logo@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
