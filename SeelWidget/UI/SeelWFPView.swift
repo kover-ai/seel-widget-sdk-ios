@@ -91,28 +91,30 @@ extension SeelWFPView {
             let infoViewController = SeelWFPInfoViewController(quoteResponse: quoteResponse, brandType: quoteResponse?.type)
             let layoutProvider = WFPInfoLayoutFactory.provider(for: quoteResponse?.type)
             infoViewController.modalPresentationStyle = layoutProvider.preferredPresentationStyle
-            infoViewController.optedInClicked = { [weak self] in
+            infoViewController.optedInClicked = { [weak self, weak infoViewController] in
                 self?.updateLocalOptedIn(true)
                 _ = self?.turnOnIfNeed(true)
-                infoViewController.dismiss(animated: true)
+                infoViewController?.dismiss(animated: true)
             }
-            infoViewController.noNeedClicked = { [weak self] in
+            infoViewController.noNeedClicked = { [weak self, weak infoViewController] in
                 self?.updateLocalOptedIn(false)
                 _ = self?.turnOnIfNeed(false)
-                infoViewController.dismiss(animated: true)
+                infoViewController?.dismiss(animated: true)
             }
-            infoViewController.privacyPolicyClicked = { [weak self] in
+            infoViewController.privacyPolicyClicked = { [weak self, weak infoViewController] in
                 if let privacyPolicyURL = self?.quoteResponse?.extraInfo?.privacyPolicyURL,
-                   let _url = URL.init(string: privacyPolicyURL)
+                   let _url = URL.init(string: privacyPolicyURL),
+                   let infoVC = infoViewController
                 {
-                    self?.openUrl(_url, base: infoViewController)
+                    self?.openUrl(_url, base: infoVC)
                 }
             }
-            infoViewController.termsClicked = { [weak self] in
+            infoViewController.termsClicked = { [weak self, weak infoViewController] in
                 if let termsURL = self?.quoteResponse?.extraInfo?.termsURL,
-                   let _url = URL.init(string: termsURL)
+                   let _url = URL.init(string: termsURL),
+                   let infoVC = infoViewController
                 {
-                    self?.openUrl(_url, base: infoViewController)
+                    self?.openUrl(_url, base: infoVC)
                 }
             }
             viewController.present(infoViewController, animated: true)
