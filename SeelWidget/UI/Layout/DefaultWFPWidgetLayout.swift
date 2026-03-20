@@ -134,7 +134,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         let deltaCount = msgs.count - detailSV.arrangedSubviews.count
         if deltaCount > 0 {
-            for _ in 0...deltaCount {
+            for _ in 0..<deltaCount {
                 detailSV.addArrangedSubview(LineView(frame: .zero))
             }
         }

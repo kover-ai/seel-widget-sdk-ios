@@ -50,7 +50,7 @@ final class CoverageDetailsView: UIView {
         
         let deltaCount = msgs.count - (stackView.arrangedSubviews.count - 1)
         if deltaCount > 0 {
-            for _ in 0...deltaCount {
+            for _ in 0..<deltaCount {
                 stackView.addArrangedSubview(CoverageLineView(frame: .zero))
             }
         }
