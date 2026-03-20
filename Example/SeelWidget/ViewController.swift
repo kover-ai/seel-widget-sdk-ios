@@ -12,6 +12,11 @@ import SnapKit
 
 class ViewController: UIViewController {
     
+    private lazy var pdpBannerView: SeelPDPBannerView = {
+        let banner = SeelPDPBannerView(frame: .zero)
+        return banner
+    }()
+    
     private lazy var wfpView: SeelWFPView = {
         let wfpView = SeelWFPView(frame: .zero)
         wfpView.layer.cornerRadius = 8
@@ -183,6 +188,7 @@ class ViewController: UIViewController {
         
         view.backgroundColor = .lightGray
         
+        view.addSubview(pdpBannerView)
         view.addSubview(wfpView)
         
         view.addSubview(errorLabel)
@@ -219,8 +225,14 @@ class ViewController: UIViewController {
         countLabel.text = "Product Count"
         countValueLabel.text = String(Int(countStepper.value))
         
-        wfpView.snp.makeConstraints { make in
+        pdpBannerView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
+            make.left.equalToSuperview().offset(16)
+            make.right.equalToSuperview().offset(-16)
+            make.height.equalTo(28)
+        }
+        wfpView.snp.makeConstraints { make in
+            make.top.equalTo(pdpBannerView.snp.bottom).offset(12)
             make.left.equalToSuperview().offset(16)
             make.right.equalToSuperview().offset(-16)
         }
@@ -309,6 +321,7 @@ class ViewController: UIViewController {
             self?.updateViews()
         }
         SeelWidgetSDK.shared.configure(apiKey: TestDatas.apiKey, environment: .development)
+        pdpBannerView.setup(type: "ebth-wfp")
         
         updateViews()
     }
