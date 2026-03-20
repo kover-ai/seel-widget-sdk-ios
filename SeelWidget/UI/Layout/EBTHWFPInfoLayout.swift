@@ -35,17 +35,14 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Bottom sheet container
         let sheetContainer = UIView()
-        sheetContainer.backgroundColor = UIColor(hex: "#F5F5F7")
+        sheetContainer.backgroundColor = .white
         sheetContainer.layer.cornerRadius = 16
         sheetContainer.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         sheetContainer.clipsToBounds = true
         view.addSubview(sheetContainer)
         
-        let topOffset = UIApplication.shared.windows.first?.safeAreaInsets.top ?? 44
-        let sheetTopMargin = topOffset + 40
-        
         sheetContainer.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(sheetTopMargin)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(40)
             make.left.right.bottom.equalToSuperview()
         }
         
@@ -121,24 +118,24 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.edges.equalToSuperview()
         }
         seelLogoIcon.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(20)
-            make.left.equalToSuperview().offset(20)
+            make.top.equalToSuperview().offset(24)
+            make.left.equalToSuperview().offset(24)
             make.width.equalTo(80)
             make.height.equalTo(22)
         }
         closeButton.snp.makeConstraints { make in
             make.centerY.equalTo(seelLogoIcon)
-            make.right.equalToSuperview().offset(-16)
+            make.right.equalToSuperview().offset(-24)
             make.width.height.equalTo(30)
         }
         headerTitleLabel.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(20)
-            make.right.equalToSuperview().offset(-20)
-            make.top.equalTo(seelLogoIcon.snp.bottom).offset(16)
+            make.left.equalToSuperview().offset(24)
+            make.right.equalToSuperview().offset(-24)
+            make.top.equalTo(seelLogoIcon.snp.bottom).offset(24)
         }
         headerSubtitleLabel.snp.makeConstraints { make in
             make.left.right.equalTo(headerTitleLabel)
-            make.top.equalTo(headerTitleLabel.snp.bottom).offset(4)
+            make.top.equalTo(headerTitleLabel.snp.bottom).offset(24)
         }
         
         // MARK: - White Card (with optional blur)
@@ -168,6 +165,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.top.equalTo(headerContainer.snp.bottom).offset(-20)
             make.left.right.equalToSuperview()
             make.bottom.equalToSuperview()
+            make.bottom.greaterThanOrEqualTo(sheetContainer.snp.bottom)
         }
         
         // MARK: - "Worry-Free Purchase®" Title
@@ -269,11 +267,12 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let footerContainer = UIView()
         whiteCard.addSubview(footerContainer)
         
-        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+        let safeBottom = view.safeAreaInsets.bottom
+        let footerBottomPadding: CGFloat = safeBottom > 0 ? safeBottom : 24
         footerContainer.snp.makeConstraints { make in
             make.top.equalTo(featureRow.snp.bottom).offset(24)
             make.left.right.equalToSuperview().inset(24)
-            make.bottom.equalToSuperview().offset(-(24 + bottomInset))
+            make.bottom.equalToSuperview().offset(-footerBottomPadding)
         }
         
         let optInButton = UIButton(type: .custom)
@@ -309,21 +308,18 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         let poweredBySV = UIStackView()
         poweredBySV.axis = .horizontal
-        poweredBySV.spacing = 4
+        poweredBySV.spacing = 2
         poweredBySV.alignment = .center
         let poweredByLabel = UILabel()
         poweredByLabel.text = "Powered By"
         poweredByLabel.font = .systemFont(ofSize: 10, weight: .regular)
         poweredByLabel.textColor = UIColor(hex: "#000000")
-        let seelWordIcon = UIImageView(image: UIImage(swName: "seel_word"))
-        seelWordIcon.contentMode = .scaleAspectFit
+        let seelTextLabel = UILabel()
+        seelTextLabel.text = "Seel"
+        seelTextLabel.font = .systemFont(ofSize: 10, weight: .bold)
+        seelTextLabel.textColor = UIColor(hex: "#000000")
         poweredBySV.addArrangedSubview(poweredByLabel)
-        poweredBySV.addArrangedSubview(seelWordIcon)
-        
-        seelWordIcon.snp.makeConstraints { make in
-            make.height.equalTo(14)
-            make.width.equalTo(30)
-        }
+        poweredBySV.addArrangedSubview(seelTextLabel)
         
         bottomRow.addArrangedSubview(linksStack)
         bottomRow.addArrangedSubview(poweredBySV)
@@ -337,9 +333,18 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.top.equalTo(optInButton.snp.bottom).offset(12)
             make.centerX.equalToSuperview()
         }
-        bottomRow.snp.makeConstraints { make in
-            make.top.equalTo(noNeedButton.snp.bottom).offset(16)
+        let divider = UIView()
+        divider.backgroundColor = UIColor(hex: "#E0E0E0")
+        footerContainer.addSubview(divider)
+        divider.snp.makeConstraints { make in
+            make.top.equalTo(noNeedButton.snp.bottom).offset(20)
             make.left.right.equalToSuperview()
+            make.height.equalTo(1)
+        }
+        bottomRow.snp.makeConstraints { make in
+            make.top.equalTo(divider.snp.bottom).offset(14)
+            make.left.equalToSuperview().offset(14)
+            make.right.equalToSuperview().offset(-14)
             make.bottom.equalToSuperview()
         }
     }
