@@ -229,7 +229,6 @@ class ViewController: UIViewController {
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
             make.left.equalToSuperview().offset(16)
             make.right.equalToSuperview().offset(-16)
-            make.height.equalTo(28)
         }
         wfpView.snp.makeConstraints { make in
             make.top.equalTo(pdpBannerView.snp.bottom).offset(12)
@@ -321,7 +320,10 @@ class ViewController: UIViewController {
             self?.updateViews()
         }
         SeelWidgetSDK.shared.configure(apiKey: TestDatas.apiKey, environment: .development)
-        pdpBannerView.setup(type: "ebth-wfp")
+        pdpBannerView.setup(type: "ebth-wfp", style: PDPBannerStyle(
+            padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12),
+            cornerRadius: 6
+        ))
         
         updateViews()
     }

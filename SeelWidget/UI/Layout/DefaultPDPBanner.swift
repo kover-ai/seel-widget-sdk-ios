@@ -39,6 +39,8 @@ final class DefaultPDPBanner: PDPBannerLayoutProvider {
 
         iconView.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(padding.left)
+            make.top.greaterThanOrEqualToSuperview().offset(padding.top)
+            make.bottom.lessThanOrEqualToSuperview().offset(-padding.bottom)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(23)
         }
