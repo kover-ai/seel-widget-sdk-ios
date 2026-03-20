@@ -165,7 +165,6 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.top.equalTo(headerContainer.snp.bottom).offset(-20)
             make.left.right.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.bottom.greaterThanOrEqualTo(sheetContainer.snp.bottom)
         }
         
         // MARK: - "Worry-Free Purchase®" Title
