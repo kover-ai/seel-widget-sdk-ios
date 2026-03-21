@@ -20,7 +20,7 @@ Alternatively, you can add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", exact: "0.1.14")
+    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", exact: "0.1.16")
 ]
 ```
 
@@ -29,7 +29,7 @@ dependencies: [
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'SeelWidget', '0.1.14'
+pod 'SeelWidget', '0.1.16'
 ```
 
 Then run:
