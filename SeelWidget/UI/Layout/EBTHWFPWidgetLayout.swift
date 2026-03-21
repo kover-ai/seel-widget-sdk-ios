@@ -35,6 +35,21 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
         return btn
     }()
 
+    private lazy var pricePrefixLabel: UILabel = {
+        let label = UILabel()
+        label.text = "for"
+        label.font = .systemFont(ofSize: 15, weight: .regular)
+        label.textColor = UIColor(hex: "#292728")
+        label.isHidden = true
+        return label
+    }()
+
+    private lazy var priceLoadingView: LoadingAnimationView = {
+        let v = LoadingAnimationView(frame: .init(x: 0, y: 0, width: 36, height: 12))
+        v.isHidden = true
+        return v
+    }()
+
     private lazy var titleRow: UIStackView = {
         let sv = UIStackView()
         sv.axis = .horizontal
@@ -102,6 +117,8 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
         rootContainer.addSubview(textContainer)
 
         titleRow.addArrangedSubview(titleLabel)
+        titleRow.addArrangedSubview(pricePrefixLabel)
+        titleRow.addArrangedSubview(priceLoadingView)
         titleRow.addArrangedSubview(infoButton)
         let spacer = UIView()
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -135,6 +152,11 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         infoButton.snp.makeConstraints { make in
             make.width.height.equalTo(16)
+        }
+
+        priceLoadingView.snp.makeConstraints { make in
+            make.width.equalTo(36)
+            make.height.equalTo(12)
         }
 
         disclaimerLabel.snp.makeConstraints { make in
@@ -172,6 +194,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         let isRejected = quoteResponse?.status == .rejected
         let isChecked = data.toggleIsOn && !isRejected
+        let isLoading = data.loading
 
         isOn = isChecked
         isDisabled = isRejected
@@ -190,18 +213,42 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
             titleLabel.text = quoteResponse?.extraInfo?.widgetTitle
             titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
             titleLabel.textColor = titleColor
+            pricePrefixLabel.isHidden = true
+            priceLoadingView.isHidden = true
+            priceLoadingView.stopAnimating()
         } else {
             let title = quoteResponse?.extraInfo?.widgetTitle ?? ""
-            let priceText = " for $\(quoteResponse?.price ?? 0)"
-            let full = title + priceText
-            let attr = NSMutableAttributedString(
-                string: full,
-                attributes: [
-                    .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
-                    .foregroundColor: titleColor
-                ]
-            )
-            titleLabel.attributedText = attr
+            pricePrefixLabel.textColor = titleColor
+            if isLoading {
+                let attr = NSMutableAttributedString(
+                    string: title,
+                    attributes: [
+                        .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                        .foregroundColor: titleColor
+                    ]
+                )
+                titleLabel.attributedText = attr
+                pricePrefixLabel.isHidden = false
+                priceLoadingView.isHidden = false
+                priceLoadingView.startAnimating()
+            } else {
+                let priceText = " for $\(quoteResponse?.price ?? 0)"
+                let full = title + priceText
+                let attr = NSMutableAttributedString(string: full)
+                
+                // Title part: Semibold
+                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .semibold), range: NSRange(location: 0, length: title.count))
+                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: 0, length: title.count))
+                
+                // Price part: Regular
+                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .regular), range: NSRange(location: title.count, length: priceText.count))
+                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: title.count, length: priceText.count))
+                
+                titleLabel.attributedText = attr
+                pricePrefixLabel.isHidden = true
+                priceLoadingView.isHidden = true
+                priceLoadingView.stopAnimating()
+            }
         }
 
         // Info button: hidden when rejected

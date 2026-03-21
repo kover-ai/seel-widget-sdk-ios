@@ -24,6 +24,7 @@ public final class SeelWFPView: UIView {
     private var quoteResponse: QuotesResponse?
     private var toggleIsOn: Bool = true
     private var layoutProvider: WFPWidgetLayoutProvider?
+    private var latestRequestToken: Int = 0
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -65,6 +66,11 @@ public final class SeelWFPView: UIView {
             toggleIsOn: toggleIsOn
         ))
     }
+
+    private func sdkDebugLog(_ message: String) {
+        guard SeelWidgetSDK.shared.environment != .production else { return }
+        print("[SeelWidgetSDK] \(message)")
+    }
 }
 
 // MARK: - Public API
@@ -77,6 +83,13 @@ extension SeelWFPView {
 
     public func updateWidgetWhenChanged(_ quote: QuotesRequest, completion: @escaping (Result<QuotesResponse, NetworkError>) -> Void) {
         createQuote(quote, isSetup: false, completion: completion)
+    }
+
+    /// Update checkbox/switch UI state immediately.
+    /// This is useful for pre-request UI updates in host app debug flows.
+    public func setToggleState(_ isOn: Bool) {
+        toggleIsOn = isOn
+        refreshLayout()
     }
 }
 
@@ -139,15 +152,29 @@ extension SeelWFPView {
     }
 
     func createQuote(_ quote: QuotesRequest, isSetup: Bool, completion: @escaping @Sendable (Result<QuotesResponse, NetworkError>) -> Void) {
+        latestRequestToken += 1
+        let requestToken = latestRequestToken
         loading = true
         refreshLayout()
         NetworkManager.shared.createQuote(quote, completion: { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
+                if requestToken != self.latestRequestToken {
+                    self.sdkDebugLog("ignore stale quote response => token: \(requestToken), latest: \(self.latestRequestToken)")
+                    completion(result)
+                    return
+                }
                 self.loading = false
                 completion(result)
                 switch result {
                 case .success(let value):
+                    let summary = "quote response => type: \(value.type ?? "nil"), status: \(value.status?.rawValue ?? "nil"), is_default_on: \(String(describing: value.isDefaultOn))"
+                    self.sdkDebugLog(summary)
+                    if let responseData = try? JSONEncoder().encode(value),
+                       let responseJSON = String(data: responseData, encoding: .utf8) {
+                        self.sdkDebugLog("quote response json => \(responseJSON)")
+                    }
+
                     let previousType = self.quoteResponse?.type
                     self.quoteResponse = value
                     
@@ -157,13 +184,11 @@ extension SeelWFPView {
                         self.refreshLayout()
                     }
 
-                    var finalOptedIn = value.isDefaultOn ?? false
-                    if let localOptValue = self.localOptedIn(value.cartID) {
-                        finalOptedIn = localOptValue
-                    }
-
-                    _ = self.turnOnIfNeed(finalOptedIn)
+                    self.sdkDebugLog("ignore is_default_on for UI => server: \(String(describing: value.isDefaultOn)), current toggle: \(self.toggleIsOn)")
+                    // Keep UI toggle as-is, but still notify host about latest optedIn/quote state.
+                    _ = self.optedChanged(self.toggleIsOn)
                 case .failure(_):
+                    self.sdkDebugLog("quote request failed => \(result)")
                     self.quoteResponse = nil
                     self.refreshLayout()
                     _ = self.optedChanged(false)

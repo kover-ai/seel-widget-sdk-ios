@@ -12,6 +12,75 @@ import SnapKit
 
 class ViewController: UIViewController {
     
+    private var type: String = "ebth-wfp"
+    
+    private lazy var debugContainer: UIView = {
+        let v = UIView()
+        v.backgroundColor = .white
+        v.layer.cornerRadius = 12
+        v.layer.shadowColor = UIColor.black.cgColor
+        v.layer.shadowOpacity = 0.1
+        v.layer.shadowOffset = CGSize(width: 0, height: 2)
+        v.layer.shadowRadius = 4
+        return v
+    }()
+    
+    private lazy var debugTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "DEBUG"
+        label.font = .systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .gray
+        return label
+    }()
+    
+    private lazy var wfpOnButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("WFP on", for: .normal)
+        btn.backgroundColor = .white
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
+        btn.layer.cornerRadius = 8
+        btn.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        btn.addTarget(self, action: #selector(simulateWFPOn), for: .touchUpInside)
+        return btn
+    }()
+    
+    private lazy var wfpOffButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("WFP off", for: .normal)
+        btn.backgroundColor = .white
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
+        btn.layer.cornerRadius = 8
+        btn.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        btn.addTarget(self, action: #selector(simulateWFPOff), for: .touchUpInside)
+        return btn
+    }()
+    
+    private lazy var rejectedButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("Simulate rejected quote", for: .normal)
+        btn.backgroundColor = .white
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
+        btn.layer.cornerRadius = 8
+        btn.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        btn.addTarget(self, action: #selector(simulateRejected), for: .touchUpInside)
+        return btn
+    }()
+    
+    private lazy var freeReturnButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("Simulate free return shipping quote", for: .normal)
+        btn.backgroundColor = .white
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
+        btn.layer.cornerRadius = 8
+        btn.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        btn.addTarget(self, action: #selector(simulateFreeReturn), for: .touchUpInside)
+        return btn
+    }()
+    
     private lazy var pdpBannerView: SeelPDPBannerView = {
         let banner = SeelPDPBannerView(frame: .zero)
         return banner
@@ -191,28 +260,40 @@ class ViewController: UIViewController {
         view.addSubview(pdpBannerView)
         view.addSubview(wfpView)
         
-        view.addSubview(errorLabel)
-        view.addSubview(errorSwitch)
-        view.addSubview(acceptedLabel)
-        view.addSubview(acceptedSwitch)
-        view.addSubview(defaultLabel)
-        view.addSubview(defaultSwitch)
-        view.addSubview(countLabel)
-        view.addSubview(countValueLabel)
-        view.addSubview(countStepper)
-        view.addSubview(optedValidTimeLabel)
-        view.addSubview(optedValidTimeValueLabel)
-        view.addSubview(optedValidTimeSlider)
+        if type == "ebth-wfp" {
+            view.addSubview(debugContainer)
+            debugContainer.addSubview(debugTitleLabel)
+            debugContainer.addSubview(wfpOnButton)
+            debugContainer.addSubview(wfpOffButton)
+            debugContainer.addSubview(rejectedButton)
+            debugContainer.addSubview(freeReturnButton)
+            
+            // setupButton, updateButton, eventButton, cleanButton, loadingIndicator, cacheInfoLabel, dividingLine
+            // are NOT added when type == "ebth-wfp"
+            view.addSubview(loadingIndicator)
+        } else {
+            view.addSubview(errorLabel)
+            view.addSubview(errorSwitch)
+            view.addSubview(acceptedLabel)
+            view.addSubview(acceptedSwitch)
+            view.addSubview(defaultLabel)
+            view.addSubview(defaultSwitch)
+            view.addSubview(countLabel)
+            view.addSubview(countValueLabel)
+            view.addSubview(countStepper)
+            view.addSubview(optedValidTimeLabel)
+            view.addSubview(optedValidTimeValueLabel)
+            view.addSubview(optedValidTimeSlider)
+            view.addSubview(dividingLine)
+            view.addSubview(setupButton)
+            view.addSubview(updateButton)
+            view.addSubview(eventButton)
+            view.addSubview(cleanButton)
+            view.addSubview(loadingIndicator)
+            view.addSubview(cacheInfoLabel)
+        }
         
-        view.addSubview(dividingLine)
         
-        view.addSubview(setupButton)
-        view.addSubview(updateButton)
-        view.addSubview(eventButton)
-        view.addSubview(cleanButton)
-        view.addSubview(loadingIndicator)
-        
-        view.addSubview(cacheInfoLabel)
         
         SeelWFPView.optedValidTime = TestDatas.defaultOptedValidTime * 60
         
@@ -225,102 +306,147 @@ class ViewController: UIViewController {
         countLabel.text = "Product Count"
         countValueLabel.text = String(Int(countStepper.value))
         
-        pdpBannerView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-        }
-        wfpView.snp.makeConstraints { make in
-            make.top.equalTo(pdpBannerView.snp.bottom).offset(12)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-        }
-        errorLabel.snp.makeConstraints { make in
-            make.top.equalTo(wfpView.snp.bottom).offset(16)
-            make.left.equalTo(wfpView)
-        }
-        errorSwitch.snp.makeConstraints { make in
-            make.centerY.equalTo(errorLabel)
-            make.right.equalTo(wfpView)
-        }
-        acceptedLabel.snp.makeConstraints { make in
-            make.top.equalTo(errorLabel.snp.bottom).offset(16)
-            make.left.equalTo(wfpView)
-        }
-        acceptedSwitch.snp.makeConstraints { make in
-            make.centerY.equalTo(acceptedLabel)
-            make.right.equalTo(wfpView)
-        }
-        defaultLabel.snp.makeConstraints { make in
-            make.top.equalTo(acceptedLabel.snp.bottom).offset(12)
-            make.left.equalTo(wfpView)
-        }
-        defaultSwitch.snp.makeConstraints { make in
-            make.centerY.equalTo(defaultLabel)
-            make.right.equalTo(wfpView)
-        }
-        countLabel.snp.makeConstraints { make in
-            make.top.equalTo(defaultLabel.snp.bottom).offset(12)
-            make.left.equalTo(wfpView)
-        }
-        countStepper.snp.makeConstraints { make in
-            make.centerY.equalTo(countLabel)
-            make.right.equalTo(wfpView)
-        }
-        countValueLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(countLabel)
-            make.right.equalTo(countStepper.snp.left).offset(-8)
-        }
-        optedValidTimeLabel.snp.makeConstraints { make in
-            make.top.equalTo(countLabel.snp.bottom).offset(12)
-            make.left.equalTo(wfpView)
-        }
-        optedValidTimeValueLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(optedValidTimeLabel)
-            make.right.equalTo(wfpView)
-//            make.right.equalTo(optedValidTimeStepper.snp.left).offset(-8)
-        }
-        optedValidTimeSlider.snp.makeConstraints { make in
-            make.top.equalTo(optedValidTimeLabel.snp.bottom).offset(12)
-            make.left.right.equalTo(wfpView)
+        if type == "ebth-wfp" {
+            pdpBannerView.snp.makeConstraints { make in
+                make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
+                make.left.equalToSuperview().offset(16)
+                make.right.equalToSuperview().offset(-16)
+            }
+            wfpView.snp.makeConstraints { make in
+                make.top.equalTo(pdpBannerView.snp.bottom).offset(12)
+                make.left.equalToSuperview().offset(16)
+                make.right.equalToSuperview().offset(-16)
+            }
+            
+            debugContainer.snp.makeConstraints { make in
+                make.top.equalTo(wfpView.snp.bottom).offset(24)
+                make.left.right.equalTo(wfpView)
+            }
+            
+            debugTitleLabel.snp.makeConstraints { make in
+                make.top.left.equalToSuperview().offset(16)
+            }
+            
+            wfpOnButton.snp.makeConstraints { make in
+                make.top.equalTo(debugTitleLabel.snp.bottom).offset(12)
+                make.left.equalToSuperview().offset(16)
+            }
+            
+            wfpOffButton.snp.makeConstraints { make in
+                make.top.equalTo(wfpOnButton)
+                make.left.equalTo(wfpOnButton.snp.right).offset(12)
+            }
+            
+            rejectedButton.snp.makeConstraints { make in
+                make.top.equalTo(wfpOnButton.snp.bottom).offset(12)
+                make.left.equalToSuperview().offset(16)
+            }
+            
+            freeReturnButton.snp.makeConstraints { make in
+                make.top.equalTo(rejectedButton.snp.bottom).offset(12)
+                make.left.equalToSuperview().offset(16)
+                make.bottom.equalToSuperview().offset(-16)
+            }
+            
+            loadingIndicator.snp.makeConstraints { make in
+                make.center.equalToSuperview()
+            }
+        } else {
+            pdpBannerView.snp.makeConstraints { make in
+                make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
+                make.left.equalToSuperview().offset(16)
+                make.right.equalToSuperview().offset(-16)
+            }
+            wfpView.snp.makeConstraints { make in
+                make.top.equalTo(pdpBannerView.snp.bottom).offset(12)
+                make.left.equalToSuperview().offset(16)
+                make.right.equalToSuperview().offset(-16)
+            }
+            errorLabel.snp.makeConstraints { make in
+                make.top.equalTo(wfpView.snp.bottom).offset(16)
+                make.left.equalTo(wfpView)
+            }
+            errorSwitch.snp.makeConstraints { make in
+                make.centerY.equalTo(errorLabel)
+                make.right.equalTo(wfpView)
+            }
+            acceptedLabel.snp.makeConstraints { make in
+                make.top.equalTo(errorLabel.snp.bottom).offset(16)
+                make.left.equalTo(wfpView)
+            }
+            acceptedSwitch.snp.makeConstraints { make in
+                make.centerY.equalTo(acceptedLabel)
+                make.right.equalTo(wfpView)
+            }
+            defaultLabel.snp.makeConstraints { make in
+                make.top.equalTo(acceptedLabel.snp.bottom).offset(12)
+                make.left.equalTo(wfpView)
+            }
+            defaultSwitch.snp.makeConstraints { make in
+                make.centerY.equalTo(defaultLabel)
+                make.right.equalTo(wfpView)
+            }
+            countLabel.snp.makeConstraints { make in
+                make.top.equalTo(defaultLabel.snp.bottom).offset(12)
+                make.left.equalTo(wfpView)
+            }
+            countStepper.snp.makeConstraints { make in
+                make.centerY.equalTo(countLabel)
+                make.right.equalTo(wfpView)
+            }
+            countValueLabel.snp.makeConstraints { make in
+                make.centerY.equalTo(countLabel)
+                make.right.equalTo(countStepper.snp.left).offset(-8)
+            }
+            optedValidTimeLabel.snp.makeConstraints { make in
+                make.top.equalTo(countLabel.snp.bottom).offset(12)
+                make.left.equalTo(wfpView)
+            }
+            optedValidTimeValueLabel.snp.makeConstraints { make in
+                make.centerY.equalTo(optedValidTimeLabel)
+                make.right.equalTo(wfpView)
+            }
+            optedValidTimeSlider.snp.makeConstraints { make in
+                make.top.equalTo(optedValidTimeLabel.snp.bottom).offset(12)
+                make.left.right.equalTo(wfpView)
+            }
+            dividingLine.snp.makeConstraints { make in
+                make.top.equalTo(optedValidTimeSlider.snp.bottom).offset(16)
+                make.left.right.equalTo(wfpView)
+                make.height.equalTo(1)
+            }
+            setupButton.snp.makeConstraints { make in
+                make.top.equalTo(dividingLine.snp.bottom).offset(16)
+                make.left.equalTo(wfpView)
+            }
+            updateButton.snp.makeConstraints { make in
+                make.top.equalTo(dividingLine.snp.bottom).offset(16)
+                make.right.equalTo(wfpView)
+            }
+            eventButton.snp.makeConstraints { make in
+                make.top.equalTo(setupButton.snp.bottom).offset(16)
+                make.left.equalTo(wfpView)
+            }
+            cleanButton.snp.makeConstraints { make in
+                make.top.equalTo(setupButton.snp.bottom).offset(16)
+                make.right.equalTo(wfpView)
+            }
+            loadingIndicator.snp.makeConstraints { make in
+                make.center.equalToSuperview()
+            }
+            cacheInfoLabel.snp.makeConstraints { make in
+                make.top.equalTo(cleanButton.snp.bottom).offset(16)
+                make.left.right.equalTo(wfpView)
+            }
         }
         
-        dividingLine.snp.makeConstraints { make in
-            make.top.equalTo(optedValidTimeSlider.snp.bottom).offset(16)
-            make.left.right.equalTo(wfpView)
-            make.height.equalTo(1)
-        }
-        // buttons
-        setupButton.snp.makeConstraints { make in
-            make.top.equalTo(dividingLine.snp.bottom).offset(16)
-            make.left.equalTo(wfpView)
-        }
-        updateButton.snp.makeConstraints { make in
-            make.top.equalTo(dividingLine.snp.bottom).offset(16)
-            make.right.equalTo(wfpView)
-        }
-        eventButton.snp.makeConstraints { make in
-            make.top.equalTo(setupButton.snp.bottom).offset(16)
-            make.left.equalTo(wfpView)
-        }
-        cleanButton.snp.makeConstraints { make in
-            make.top.equalTo(setupButton.snp.bottom).offset(16)
-            make.right.equalTo(wfpView)
-        }
-        loadingIndicator.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
-        cacheInfoLabel.snp.makeConstraints { make in
-            make.top.equalTo(cleanButton.snp.bottom).offset(16)
-            make.left.right.equalTo(wfpView)
-        }
         
         wfpView.optedIn = { [weak self] optedIn, quote in
             print("optedIn:\(optedIn) price:\(quote?.price ?? 0)")
             self?.updateViews()
         }
         SeelWidgetSDK.shared.configure(apiKey: TestDatas.apiKey, environment: .development)
-        pdpBannerView.setup(type: "ebth-wfp", style: PDPBannerStyle(
+        pdpBannerView.setup(type: type, style: PDPBannerStyle(
             padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12),
             cornerRadius: 6
         ))
@@ -365,6 +491,124 @@ class ViewController: UIViewController {
         updateViews()
     }
     
+    @objc private func simulateWFPOn() {
+        setLocalOptedIn(true, cartID: "3b87ea2a6cecdb94bae186263feb9e7f")
+        wfpView.setToggleState(true)
+        let quotes = makeEBTHDebugQuote(
+            isDefaultOn: true,
+            requiresShipping: true,
+            quoteExtraInfo: ["shipping_fee": AnyCodable(10)]
+        )
+        loading(true)
+        wfpView.setup(quotes) { [weak self] _ in
+            self?.loading(false)
+        }
+    }
+    
+    @objc private func simulateWFPOff() {
+        setLocalOptedIn(false, cartID: "3b87ea2a6cecdb94bae186263feb9e7f")
+        wfpView.setToggleState(false)
+        let quotes = makeEBTHDebugQuote(
+            isDefaultOn: false,
+            requiresShipping: true,
+            quoteExtraInfo: ["shipping_fee": AnyCodable(10)]
+        )
+        loading(true)
+        wfpView.setup(quotes) { [weak self] _ in
+            self?.loading(false)
+        }
+    }
+    
+    @objc private func simulateRejected() {
+        let quotes = makeEBTHDebugQuote(
+            isDefaultOn: false,
+            requiresShipping: false,
+            quoteExtraInfo: [:]
+        )
+        loading(true)
+        wfpView.setup(quotes) { [weak self] _ in
+            self?.loading(false)
+        }
+    }
+    
+    @objc private func simulateFreeReturn() {
+        let quotes = makeEBTHDebugQuote(
+            isDefaultOn: false,
+            requiresShipping: true,
+            quoteExtraInfo: ["shipping_fee": AnyCodable(10)],
+            lineItemExtraInfo: ["free_return_eligible": AnyCodable(true)]
+        )
+        loading(true)
+        wfpView.setup(quotes) { [weak self] _ in
+            self?.loading(false)
+        }
+    }
+
+    private func makeEBTHDebugQuote(
+        isDefaultOn: Bool,
+        requiresShipping: Bool,
+        quoteExtraInfo: [String: AnyCodable],
+        lineItemExtraInfo: [String: AnyCodable]? = nil
+    ) -> QuotesRequest {
+        let lineItem = QuoteLineItem(
+            lineItemID: "11111",
+            productID: "10013-0000-319802",
+            productTitle: "Brass Crystal Mini Table Lamp",
+            quantity: 3,
+            price: 50,
+            allocatedDiscounts: 0,
+            salesTax: 0,
+            finalPrice: 50,
+            currency: "USD",
+            requiresShipping: requiresShipping,
+            category1: "Household Goods",
+            category2: "Decor",
+            isFinalSale: true,
+            condition: "used",
+            variantID: "10013-0000-319802",
+            variantTitle: "Brass Crystal Mini Table Lamp",
+            imageURLs: [
+                "https://example.com/image1",
+                "https://example.com/image2"
+            ],
+            shippingOrigin: QuoteShippingOrigin(country: "US"),
+            extraInfo: lineItemExtraInfo
+        )
+
+        return QuotesRequest(
+            sessionID: "3b87ea2a6cecdb94bae186263feb9e7f",
+            deviceCategory: "mobile",
+            devicePlatform: "iOS",
+            type: "ebth-wfp",
+            isDefaultOn: isDefaultOn,
+            lineItems: [lineItem],
+            shippingAddress: QuoteShippingAddress(
+                address1: "7 Buswell Street",
+                city: "Boston",
+                state: "MA",
+                zipcode: "02215",
+                country: "US"
+            ),
+            customer: QuoteCustomer(
+                customerID: "1111",
+                email: "xie@seel.com",
+                firstName: "name",
+                lastName: "name",
+                phone: nil
+            ),
+            cartID: "3b87ea2a6cecdb94bae186263feb9e7f",
+            merchantID: "20251219208123118426",
+            deviceID: "1737534673",
+            extraInfo: quoteExtraInfo
+        )
+    }
+
+    private func setLocalOptedIn(_ optedIn: Bool, cartID: String) {
+        UserDefaults.standard.set(cartID, forKey: TestDatas.cartIdKey)
+        UserDefaults.standard.set(optedIn, forKey: TestDatas.optedValueKey)
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: TestDatas.optedOperationTimeKey)
+    }
+
     func loading(_ loading: Bool) {
         // Handle loading state
         if loading {

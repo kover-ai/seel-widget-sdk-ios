@@ -54,6 +54,8 @@ final class EBTHPDPBanner: PDPBannerLayoutProvider {
             make.left.equalTo(textLabel.snp.right).offset(4)
             make.centerY.equalToSuperview()
             make.right.lessThanOrEqualToSuperview().offset(-padding.right)
+            make.top.equalToSuperview().offset(padding.top)
+            make.bottom.equalToSuperview().offset(-padding.bottom)
         }
     }
 }
