@@ -102,50 +102,51 @@ class ViewController: UIViewController {
 ```swift
 // Create quote information request
 let quotesRequest = QuotesRequest(
-    type: "seel-wfp",
-    cartID: "your_cart_id",
     sessionID: "your_session_id",
-    merchantID: "your_merchant_id",
-    deviceID: "your_device_id",
     deviceCategory: "mobile",
-    devicePlatform: "ios",
+    devicePlatform: "iOS",
+    type: "seel-wfp",
     isDefaultOn: true,
     lineItems: [
-        QuotesRequest.LineItem(
+        QuoteLineItem(
             lineItemID: "item_1",
             productID: "product_123",
-            variantID: "variant_456",
             productTitle: "iPhone 15 Pro",
-            variantTitle: "256GB Space Black",
-            price: 999.0,
             quantity: 1,
-            currency: "USD",
-            salesTax: 0.0,
-            requiresShipping: true,
-            finalPrice: "999.00",
-            isFinalSale: false,
+            price: 999.0,
             allocatedDiscounts: 0.0,
+            salesTax: 0.0,
+            finalPrice: 999.0,
+            currency: "USD",
+            requiresShipping: true,
             category1: "Electronics",
             category2: "Smartphones",
+            isFinalSale: false,
+            condition: "new",
+            variantID: "variant_456",
+            variantTitle: "256GB Space Black",
             imageURLs: ["https://example.com/iphone.jpg"],
-            shippingOrigin: QuotesRequest.ShippingOrigin(country: "US")
+            shippingOrigin: QuoteShippingOrigin(country: "US")
         )
     ],
-    shippingAddress: QuotesRequest.ShippingAddress(
+    shippingAddress: QuoteShippingAddress(
         address1: "123 Main St",
         city: "San Francisco",
         state: "CA",
         zipcode: "94102",
         country: "US"
     ),
-    customer: QuotesRequest.Customer(
+    customer: QuoteCustomer(
         customerID: "customer_123",
+        email: "john@example.com",
         firstName: "John",
         lastName: "Doe",
-        email: "john@example.com",
         phone: "+1234567890"
     ),
-    extraInfo: QuotesRequest.ExtraInfo(shippingFee: 10.0)
+    cartID: "your_cart_id",
+    merchantID: "your_merchant_id",
+    deviceID: "your_device_id",
+    extraInfo: ["shipping_fee": AnyCodable(10.0)]
 )
 
 // Initial setup of quote component
@@ -212,8 +213,6 @@ wfpView.optedIn = { optedIn, quote in
         print("User turned quote off")
     }
 }
-```
-
 ```
 
 ### SeelPDPBannerView Component
@@ -352,43 +351,70 @@ func setup(type: String?, style: PDPBannerStyle = PDPBannerStyle())
 - **extra_info** (QuoteExtraInfo, optional): Extra info.
 
 ##### QuoteLineItem
-- **line_item_id** (String, optional)
-- **product_id** (String, optional)
+- **line_item_id** (String, required): The ID of the item.
+- **product_id** (String, required): The ID of the product.
+- **product_title** (String, required): The title of the product.
+- **quantity** (Int, required): The quantity of the product.
+- **price** (Double, required): The price of the product.
+- **allocated_discounts** (Double, required): The allocated discounts.
+- **sales_tax** (Double, required): The sales tax.
+- **final_price** (Double, required): The final price.
+- **currency** (String, required): ISO 4217 currency code, e.g. `USD`.
+- **requires_shipping** (Bool, required): Whether the item requires shipping.
+- **category_1** (String, required): The main category.
+- **category_2** (String, required): The sub category.
+- **is_final_sale** (Bool, required): Whether the item is final sale.
+- **condition** (String, required): Physical condition: `new`, `used`, or `refurbished`.
 - **variant_id** (String, optional)
-- **product_title** (String, optional)
 - **variant_title** (String, optional)
-- **price** (Double, optional)
-- **quantity** (Int, optional)
-- **currency** (String, optional)
-- **sales_tax** (Double, optional)
-- **requires_shipping** (Bool, optional)
-- **final_price** (String, optional)
-- **is_final_sale** (Bool, optional)
-- **allocated_discounts** (Double, optional)
-- **category_1** (String, optional)
-- **category_2** (String, optional)
+- **product_description** (String, optional)
+- **sku** (String, optional)
+- **seller_id** (String, optional)
+- **seller_name** (String, optional)
+- **brand_name** (String, optional)
+- **retail_price** (Double, optional)
+- **product_url** (String, optional)
 - **image_urls** ([String], optional)
+- **category_3** (String, optional)
+- **category_4** (String, optional)
+- **product_attributes** (QuoteProductAttributes, optional)
 - **shipping_origin** (QuoteShippingOrigin, optional)
+- **extra_info** ([String: AnyCodable], optional): Open structure for additional item data.
 
 ##### QuoteShippingOrigin
-- **country** (String, optional)
-
-##### QuoteShippingAddress
+- **country** (String, required): ISO 3166-1 alpha-2 country code.
 - **address_1** (String, optional)
+- **address_2** (String, optional)
 - **city** (String, optional)
 - **state** (String, optional)
 - **zipcode** (String, optional)
-- **country** (String, optional)
+
+##### QuoteShippingAddress
+- **address_1** (String, required): The first line of the address.
+- **city** (String, required): The city.
+- **state** (String, required): The state or province code.
+- **zipcode** (String, required): The zipcode.
+- **country** (String, required): ISO 3166-1 alpha-2 country code.
+- **address_2** (String, optional)
 
 ##### QuoteCustomer
-- **customer_id** (String, required)
+- **customer_id** (String, required): The unique identifier for the customer.
+- **email** (String, required): The email address.
 - **first_name** (String, optional)
 - **last_name** (String, optional)
-- **email** (String, required)
 - **phone** (String, optional)
+- **extra_info** ([String: AnyCodable], optional): Open structure for additional customer data.
 
-##### QuoteExtraInfo
-- **shipping_fee** (Double, optional)
+##### extra_info (Quote-level)
+
+The top-level `extra_info` is an open `[String: AnyCodable]` dictionary. You can pass any key-value pairs:
+
+```swift
+extraInfo: [
+    "shipping_fee": AnyCodable(10.0),
+    "shipping_method": AnyCodable("standard")
+]
+```
 
 #### EventsRequest
 
