@@ -88,7 +88,8 @@ class ViewController: UIViewController {
     
     private lazy var wfpView: SeelWFPView = {
         let wfpView = SeelWFPView(frame: .zero)
-        wfpView.layer.cornerRadius = 8
+//        wfpView.layer.cornerRadius = 8
+        wfpView.cornerRadius = 8
         return wfpView
     }()
     

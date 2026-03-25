@@ -28,11 +28,13 @@ private let currencyLocaleMap: [String: String] = [
     "DKK": "da-DK",
 ]
 
-// #1: Cache NumberFormatter instances to avoid repeated creation overhead
+private let formatterLock = NSLock()
 private var formatterCache: [String: NumberFormatter] = [:]
 
 private func cachedFormatter(locale: String, currencyCode: String) -> NumberFormatter {
     let key = "\(locale)_\(currencyCode)"
+    formatterLock.lock()
+    defer { formatterLock.unlock() }
     if let cached = formatterCache[key] {
         return cached
     }

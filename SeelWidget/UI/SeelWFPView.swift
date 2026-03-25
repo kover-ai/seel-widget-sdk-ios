@@ -40,6 +40,14 @@ public final class SeelWFPView: UIView {
     
     public var showDisclaimer: Bool = true
     
+    /// Corner radius for the widget. Defaults to 0 (no rounding).
+    public var cornerRadius: CGFloat = 0 {
+        didSet {
+            layer.cornerRadius = cornerRadius
+            clipsToBounds = cornerRadius > 0
+        }
+    }
+    
     private var loading: Bool = false
     private var quoteResponse: QuotesResponse?
     private var toggleIsOn: Bool = true
@@ -185,7 +193,7 @@ extension SeelWFPView {
                 guard let self = self else { return }
                 if requestToken != self.latestRequestToken {
                     self.sdkDebugLog("ignore stale quote response => token: \(requestToken), latest: \(self.latestRequestToken)")
-                    completion(result)
+                    completion(.failure(.cancelled))
                     return
                 }
                 self.loading = false

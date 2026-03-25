@@ -38,9 +38,10 @@ public class SeelWidgetSDK {
         return _environment
     }
     
-    /// Check if configured
+    /// Check if configured (apiKey must be non-nil and non-empty)
     public var isConfigured: Bool {
-        return _apiKey != nil
+        guard let key = _apiKey else { return false }
+        return !key.isEmpty
     }
     
     public func createEvents(_ event: EventsRequest, completion: @escaping @Sendable (Result<EventsResponse, NetworkError>) -> Void) {

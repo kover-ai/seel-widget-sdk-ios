@@ -7,6 +7,7 @@ public enum NetworkError: Error, Sendable {
     case decodingError(Error)
     case networkError(Error)
     case serverError(Int)
+    case cancelled
     case unknown
 }
 

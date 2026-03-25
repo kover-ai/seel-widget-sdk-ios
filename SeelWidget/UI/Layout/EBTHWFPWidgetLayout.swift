@@ -242,13 +242,14 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
                 let full = title + priceText
                 let attr = NSMutableAttributedString(string: full)
                 
-                // Title part: Semibold
-                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .semibold), range: NSRange(location: 0, length: title.count))
-                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: 0, length: title.count))
+                let titleUTF16Len = (title as NSString).length
+                let priceUTF16Len = (priceText as NSString).length
                 
-                // Price part: Regular
-                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .regular), range: NSRange(location: title.count, length: priceText.count))
-                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: title.count, length: priceText.count))
+                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .semibold), range: NSRange(location: 0, length: titleUTF16Len))
+                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: 0, length: titleUTF16Len))
+                
+                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .regular), range: NSRange(location: titleUTF16Len, length: priceUTF16Len))
+                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: titleUTF16Len, length: priceUTF16Len))
                 
                 titleLabel.attributedText = attr
                 pricePrefixLabel.isHidden = true
