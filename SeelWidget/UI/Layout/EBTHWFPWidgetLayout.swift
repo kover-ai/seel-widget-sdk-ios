@@ -6,6 +6,8 @@ import SnapKit
 /// Three visual states: normal (unchecked), selected (checked), disabled (rejected).
 final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
+    var defaultShowDisclaimer: Bool { false }
+
     private var actions: WFPWidgetLayoutActions?
 
     // MARK: - Checkbox
@@ -204,7 +206,13 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         disabledTapGesture.isEnabled = isRejected
 
-        container.backgroundColor = isRejected ? UIColor(hex: "#F0EFEF") : .white
+        if isRejected {
+            container.backgroundColor = data.disabledBackgroundColor
+        } else if data.toggleIsOn {
+            container.backgroundColor = data.selectedBackgroundColor
+        } else {
+            container.backgroundColor = data.normalBackgroundColor
+        }
         container.alpha = 1.0
 
         // Title: "Worry-Free Purchase® for $3.75"
@@ -232,17 +240,18 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
                 priceLoadingView.isHidden = false
                 priceLoadingView.startAnimating()
             } else {
-                let priceText = " for $\(quoteResponse?.price ?? 0)"
+                let priceText = " for \(formatMoney(quoteResponse?.price, currency: quoteResponse?.currency))"
                 let full = title + priceText
                 let attr = NSMutableAttributedString(string: full)
                 
-                // Title part: Semibold
-                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .semibold), range: NSRange(location: 0, length: title.count))
-                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: 0, length: title.count))
+                let titleUTF16Len = (title as NSString).length
+                let priceUTF16Len = (priceText as NSString).length
                 
-                // Price part: Regular
-                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .regular), range: NSRange(location: title.count, length: priceText.count))
-                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: title.count, length: priceText.count))
+                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .semibold), range: NSRange(location: 0, length: titleUTF16Len))
+                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: 0, length: titleUTF16Len))
+                
+                attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 15, weight: .regular), range: NSRange(location: titleUTF16Len, length: priceUTF16Len))
+                attr.addAttribute(.foregroundColor, value: titleColor, range: NSRange(location: titleUTF16Len, length: priceUTF16Len))
                 
                 titleLabel.attributedText = attr
                 pricePrefixLabel.isHidden = true
@@ -273,8 +282,9 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
             subtitleLabel.isHidden = true
         }
 
-        // Disclaimer: hidden when rejected
-        if !isRejected,
+        // Disclaimer: hidden when rejected or showDisclaimer is false
+        if data.showDisclaimer,
+           !isRejected,
            let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer,
            !disclaimer.isEmpty {
             disclaimerLabel.text = disclaimer

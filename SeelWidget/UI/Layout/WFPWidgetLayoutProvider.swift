@@ -6,6 +6,10 @@ struct WFPWidgetLayoutData {
     let loading: Bool
     let toggleStyle: ToggleStyle
     let toggleIsOn: Bool
+    let normalBackgroundColor: UIColor
+    let selectedBackgroundColor: UIColor
+    let disabledBackgroundColor: UIColor
+    let showDisclaimer: Bool
 }
 
 /// Callbacks the widget layout can trigger back to SeelWFPView.
@@ -18,6 +22,9 @@ struct WFPWidgetLayoutActions {
 /// Protocol that defines how the WFP widget builds its UI.
 /// Each brand type can provide a different implementation.
 protocol WFPWidgetLayoutProvider {
+
+    /// Default value for showDisclaimer when the host has not explicitly set it.
+    var defaultShowDisclaimer: Bool { get }
 
     /// Called once to create and add subviews into the container.
     func buildLayout(

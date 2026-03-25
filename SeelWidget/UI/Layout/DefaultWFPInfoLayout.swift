@@ -36,12 +36,19 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         let wfpView = CoverageTitleView()
         wfpView.title = quoteResponse?.extraInfo?.widgetTitle
         wfpView.price = quoteResponse?.price
+        wfpView.currency = quoteResponse?.currency
         wfpView.updateViews()
         
         let seelLabel = UILabel()
-        let attributedText = NSMutableAttributedString(string: "What's Covered by Seel")
-        attributedText.addAttribute(.foregroundColor, value: UIColor(hex: "#2121C4"), range: NSRange(location: 18, length: 4))
-        attributedText.addAttribute(.foregroundColor, value: UIColor(hex: "#000000"), range: NSRange(location: 0, length: 18))
+        let seelFullText = "What's Covered by Seel"
+        let seelKeyword = "Seel"
+        let attributedText = NSMutableAttributedString(string: seelFullText)
+        let nsFullText = seelFullText as NSString
+        attributedText.addAttribute(.foregroundColor, value: UIColor(hex: "#000000"), range: NSRange(location: 0, length: nsFullText.length))
+        let seelRange = nsFullText.range(of: seelKeyword)
+        if seelRange.location != NSNotFound {
+            attributedText.addAttribute(.foregroundColor, value: UIColor(hex: "#2121C4"), range: seelRange)
+        }
         seelLabel.attributedText = attributedText
         seelLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         
@@ -103,7 +110,15 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
             make.right.equalToSuperview().offset(-30)
             make.top.equalTo(coverageDetailsView.snp.bottom).offset(20)
         }
-        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+        let bottomInset: CGFloat
+        if #available(iOS 13.0, *) {
+            let scene = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .first(where: { $0.activationState == .foregroundActive })
+            bottomInset = scene?.windows.first(where: { $0.isKeyWindow })?.safeAreaInsets.bottom ?? 0
+        } else {
+            bottomInset = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+        }
         coverageInfoFooter.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)

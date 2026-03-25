@@ -9,6 +9,8 @@ final class SeelWFPTitleView: UIView {
     
     public var price: Double?
     
+    public var currency: String?
+    
     public var loading: Bool = false
     
     public var showInfo: Bool = false
@@ -138,7 +140,7 @@ final class SeelWFPTitleView: UIView {
             priceLabel.text = "for"
             animationView.startAnimating()
         } else {
-            priceLabel.text = "for $\(String(describing: price ?? 0))"
+            priceLabel.text = "for \(formatMoney(price, currency: currency))"
             animationView.stopAnimating()
         }
         

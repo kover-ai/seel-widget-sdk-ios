@@ -99,8 +99,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         headerContainer.addSubview(headerTitleLabel)
         
         let headerSubtitleLabel = UILabel()
-        let priceText = quoteResponse?.price.map { String(format: "$%.2f", $0) } ?? ""
-        headerSubtitleLabel.text = priceText.isEmpty ? "" : "Only \(priceText) for Complete Peace of Mind"
+        let priceText = formatMoney(quoteResponse?.price, currency: quoteResponse?.currency)
+        headerSubtitleLabel.text = quoteResponse?.price != nil ? "Only \(priceText) for Complete Peace of Mind" : ""
         headerSubtitleLabel.font = .systemFont(ofSize: 16, weight: .medium)
         headerSubtitleLabel.textColor = UIColor.white
         headerSubtitleLabel.numberOfLines = 0

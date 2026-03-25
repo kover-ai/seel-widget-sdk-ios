@@ -20,6 +20,41 @@ public final class SeelWFPView: UIView {
     
     public var optedIn: WFPOptedIn?
     
+    private var _normalBackgroundColor: UIColor?
+    
+    /// Background color for normal state. Defaults to the view's own backgroundColor.
+    public var normalBackgroundColor: UIColor {
+        get { _normalBackgroundColor ?? (backgroundColor ?? .clear) }
+        set { _normalBackgroundColor = newValue }
+    }
+    
+    private var _selectedBackgroundColor: UIColor?
+    
+    /// Background color for selected (optedIn) state. Defaults to the view's own backgroundColor.
+    public var selectedBackgroundColor: UIColor {
+        get { _selectedBackgroundColor ?? (backgroundColor ?? .clear) }
+        set { _selectedBackgroundColor = newValue }
+    }
+    
+    public var disabledBackgroundColor: UIColor = UIColor(hex: "#F0EFEF")
+    
+    private var _showDisclaimer: Bool?
+    
+    /// Whether to show the widget disclaimer text.
+    /// If not explicitly set, uses the brand layout provider's default.
+    public var showDisclaimer: Bool {
+        get { _showDisclaimer ?? (layoutProvider?.defaultShowDisclaimer ?? true) }
+        set { _showDisclaimer = newValue }
+    }
+    
+    /// Corner radius for the widget. Defaults to 0 (no rounding).
+    public var cornerRadius: CGFloat = 0 {
+        didSet {
+            layer.cornerRadius = cornerRadius
+            clipsToBounds = cornerRadius > 0
+        }
+    }
+    
     private var loading: Bool = false
     private var quoteResponse: QuotesResponse?
     private var toggleIsOn: Bool = true
@@ -63,7 +98,11 @@ public final class SeelWFPView: UIView {
             quoteResponse: quoteResponse,
             loading: loading,
             toggleStyle: SeelWFPView.toggleStyle,
-            toggleIsOn: toggleIsOn
+            toggleIsOn: toggleIsOn,
+            normalBackgroundColor: normalBackgroundColor,
+            selectedBackgroundColor: selectedBackgroundColor,
+            disabledBackgroundColor: disabledBackgroundColor,
+            showDisclaimer: showDisclaimer
         ))
     }
 
@@ -161,7 +200,7 @@ extension SeelWFPView {
                 guard let self = self else { return }
                 if requestToken != self.latestRequestToken {
                     self.sdkDebugLog("ignore stale quote response => token: \(requestToken), latest: \(self.latestRequestToken)")
-                    completion(result)
+                    completion(.failure(.cancelled))
                     return
                 }
                 self.loading = false

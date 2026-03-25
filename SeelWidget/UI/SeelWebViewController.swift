@@ -4,7 +4,7 @@ import SnapKit
 
 final class SeelWebViewController: UIViewController {
     
-    private var webView: WKWebView!
+    private var webView: WKWebView?
     private var url: URL
     
     // Navigation bar
@@ -88,17 +88,18 @@ final class SeelWebViewController: UIViewController {
     }
     
     deinit {
-        webView.removeObserver(self, forKeyPath: "estimatedProgress")
-        webView.removeObserver(self, forKeyPath: "title")
+        webView?.removeObserver(self, forKeyPath: "estimatedProgress")
+        webView?.removeObserver(self, forKeyPath: "title")
     }
     
     private func setupWebView() {
         let configuration = WKWebViewConfiguration()
-        webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.backgroundColor = .clear
-        webView.navigationDelegate = self
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(webView)
+        let wv = WKWebView(frame: .zero, configuration: configuration)
+        wv.backgroundColor = .clear
+        wv.navigationDelegate = self
+        wv.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(wv)
+        webView = wv
     }
     
     private func setupUI() {
@@ -144,7 +145,7 @@ final class SeelWebViewController: UIViewController {
             make.height.equalTo(2)
         }
         
-        webView.snp.makeConstraints { make in
+        webView?.snp.makeConstraints { make in
             make.top.equalTo(navigationBar.snp.bottom)
             make.left.right.bottom.equalToSuperview()
         }
@@ -159,19 +160,19 @@ final class SeelWebViewController: UIViewController {
     
     private func loadURL() {
         let request = URLRequest(url: url)
-        webView.load(request)
+        webView?.load(request)
     }
     
     private func addProgressObserver() {
-        webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: "title", options: .new, context: nil)
+        webView?.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+        webView?.addObserver(self, forKeyPath: "title", options: .new, context: nil)
     }
     
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                let progress = Float(self.webView.estimatedProgress)
+                let progress = Float(self.webView?.estimatedProgress ?? 0)
                 self.progressView.setProgress(progress, animated: true)
             }
         } else if keyPath == "title" {
@@ -182,8 +183,8 @@ final class SeelWebViewController: UIViewController {
     }
     
     @objc private func backButtonTapped() {
-        if webView.canGoBack {
-            webView.goBack()
+        if webView?.canGoBack == true {
+            webView?.goBack()
         } else {
             dismiss(animated: true)
         }
@@ -225,11 +226,10 @@ extension SeelWebViewController: WKNavigationDelegate {
     }
     
     private func updateTitle() {
-        if let title = webView.title, !title.isEmpty {
+        if let title = webView?.title, !title.isEmpty {
             titleLabel.text = title
         } else {
-            // If no title, show URL host part
-            if let host = webView.url?.host {
+            if let host = webView?.url?.host {
                 titleLabel.text = host
             } else {
                 titleLabel.text = ""
@@ -252,7 +252,7 @@ extension SeelWebViewController: WKNavigationDelegate {
     }
     
     private func updateBackButtonState() {
-        if webView.canGoBack {
+        if webView?.canGoBack == true {
             backButton.isHidden = false
             backButton.isEnabled = true
             backButton.alpha = 1.0
