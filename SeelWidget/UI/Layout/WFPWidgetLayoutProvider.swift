@@ -6,6 +6,10 @@ struct WFPWidgetLayoutData {
     let loading: Bool
     let toggleStyle: ToggleStyle
     let toggleIsOn: Bool
+    let normalBackgroundColor: UIColor
+    let selectedBackgroundColor: UIColor
+    let disabledBackgroundColor: UIColor
+    let showDisclaimer: Bool
 }
 
 /// Callbacks the widget layout can trigger back to SeelWFPView.

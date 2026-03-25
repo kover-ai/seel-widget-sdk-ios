@@ -20,6 +20,26 @@ public final class SeelWFPView: UIView {
     
     public var optedIn: WFPOptedIn?
     
+    private var _normalBackgroundColor: UIColor?
+    
+    /// Background color for normal state. Defaults to the view's own backgroundColor.
+    public var normalBackgroundColor: UIColor {
+        get { _normalBackgroundColor ?? (backgroundColor ?? .clear) }
+        set { _normalBackgroundColor = newValue }
+    }
+    
+    private var _selectedBackgroundColor: UIColor?
+    
+    /// Background color for selected (optedIn) state. Defaults to the view's own backgroundColor.
+    public var selectedBackgroundColor: UIColor {
+        get { _selectedBackgroundColor ?? (backgroundColor ?? .clear) }
+        set { _selectedBackgroundColor = newValue }
+    }
+    
+    public var disabledBackgroundColor: UIColor = UIColor(hex: "#F0EFEF")
+    
+    public var showDisclaimer: Bool = true
+    
     private var loading: Bool = false
     private var quoteResponse: QuotesResponse?
     private var toggleIsOn: Bool = true
@@ -63,7 +83,11 @@ public final class SeelWFPView: UIView {
             quoteResponse: quoteResponse,
             loading: loading,
             toggleStyle: SeelWFPView.toggleStyle,
-            toggleIsOn: toggleIsOn
+            toggleIsOn: toggleIsOn,
+            normalBackgroundColor: normalBackgroundColor,
+            selectedBackgroundColor: selectedBackgroundColor,
+            disabledBackgroundColor: disabledBackgroundColor,
+            showDisclaimer: showDisclaimer
         ))
     }
 

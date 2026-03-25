@@ -36,6 +36,7 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         let wfpView = CoverageTitleView()
         wfpView.title = quoteResponse?.extraInfo?.widgetTitle
         wfpView.price = quoteResponse?.price
+        wfpView.currency = quoteResponse?.currency
         wfpView.updateViews()
         
         let seelLabel = UILabel()

@@ -7,6 +7,8 @@ final class CoverageTitleView: UIView {
     
     public var price: Double?
     
+    public var currency: String?
+    
     private lazy var contentSV: UIStackView = {
         let sv = UIStackView(frame: .zero)
         sv.axis = .horizontal
@@ -52,7 +54,7 @@ final class CoverageTitleView: UIView {
     func updateViews() {
         let attributedText = NSMutableAttributedString(string: title ?? "")
         if let _price = price {
-            attributedText.append(NSAttributedString(string: " for $\(String(describing: _price))", attributes: [
+            attributedText.append(NSAttributedString(string: " for \(formatMoney(_price, currency: currency))", attributes: [
                 .font: UIFont.systemFont(ofSize: 16, weight: .regular),
             ]))
         }

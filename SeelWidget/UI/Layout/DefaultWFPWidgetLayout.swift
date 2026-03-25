@@ -106,10 +106,18 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         let isRejected = quoteResponse?.status == .rejected
 
-        container.alpha = isRejected ? 0.9 : 1
+        if isRejected {
+            container.backgroundColor = data.disabledBackgroundColor
+        } else if data.toggleIsOn {
+            container.backgroundColor = data.selectedBackgroundColor
+        } else {
+            container.backgroundColor = data.normalBackgroundColor
+        }
+        container.alpha = 1
 
         titleView.title = quoteResponse?.extraInfo?.widgetTitle
         titleView.price = isRejected ? nil : quoteResponse?.price
+        titleView.currency = quoteResponse?.currency
         titleView.showInfo = !isRejected && quoteResponse != nil
         titleView.loading = data.loading
         titleView.updateViews()
@@ -152,7 +160,9 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
         }
 
         // Disclaimer
-        if let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer, !disclaimer.isEmpty {
+        if data.showDisclaimer,
+           let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer,
+           !disclaimer.isEmpty {
             disclaimerLabel.text = disclaimer
             disclaimerLabel.isHidden = false
         } else {

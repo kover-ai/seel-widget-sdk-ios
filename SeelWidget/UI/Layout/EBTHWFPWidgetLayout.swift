@@ -204,7 +204,13 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         disabledTapGesture.isEnabled = isRejected
 
-        container.backgroundColor = isRejected ? UIColor(hex: "#F0EFEF") : .white
+        if isRejected {
+            container.backgroundColor = data.disabledBackgroundColor
+        } else if data.toggleIsOn {
+            container.backgroundColor = data.selectedBackgroundColor
+        } else {
+            container.backgroundColor = data.normalBackgroundColor
+        }
         container.alpha = 1.0
 
         // Title: "Worry-Free Purchase® for $3.75"
@@ -232,7 +238,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
                 priceLoadingView.isHidden = false
                 priceLoadingView.startAnimating()
             } else {
-                let priceText = " for $\(quoteResponse?.price ?? 0)"
+                let priceText = " for \(formatMoney(quoteResponse?.price, currency: quoteResponse?.currency))"
                 let full = title + priceText
                 let attr = NSMutableAttributedString(string: full)
                 
@@ -273,8 +279,9 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
             subtitleLabel.isHidden = true
         }
 
-        // Disclaimer: hidden when rejected
-        if !isRejected,
+        // Disclaimer: hidden when rejected or showDisclaimer is false
+        if data.showDisclaimer,
+           !isRejected,
            let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer,
            !disclaimer.isEmpty {
             disclaimerLabel.text = disclaimer
