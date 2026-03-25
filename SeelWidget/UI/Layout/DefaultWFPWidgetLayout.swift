@@ -4,6 +4,8 @@ import SnapKit
 /// The original WFP widget layout — used when brandType is nil or unrecognized.
 final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
 
+    var defaultShowDisclaimer: Bool { true }
+
     private lazy var contentSV: UIStackView = {
         let sv = UIStackView(frame: .zero)
         sv.axis = .vertical

@@ -38,7 +38,14 @@ public final class SeelWFPView: UIView {
     
     public var disabledBackgroundColor: UIColor = UIColor(hex: "#F0EFEF")
     
-    public var showDisclaimer: Bool = true
+    private var _showDisclaimer: Bool?
+    
+    /// Whether to show the widget disclaimer text.
+    /// If not explicitly set, uses the brand layout provider's default.
+    public var showDisclaimer: Bool {
+        get { _showDisclaimer ?? (layoutProvider?.defaultShowDisclaimer ?? true) }
+        set { _showDisclaimer = newValue }
+    }
     
     /// Corner radius for the widget. Defaults to 0 (no rounding).
     public var cornerRadius: CGFloat = 0 {

@@ -23,6 +23,9 @@ struct WFPWidgetLayoutActions {
 /// Each brand type can provide a different implementation.
 protocol WFPWidgetLayoutProvider {
 
+    /// Default value for showDisclaimer when the host has not explicitly set it.
+    var defaultShowDisclaimer: Bool { get }
+
     /// Called once to create and add subviews into the container.
     func buildLayout(
         in container: UIView,

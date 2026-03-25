@@ -6,6 +6,8 @@ import SnapKit
 /// Three visual states: normal (unchecked), selected (checked), disabled (rejected).
 final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
+    var defaultShowDisclaimer: Bool { false }
+
     private var actions: WFPWidgetLayoutActions?
 
     // MARK: - Checkbox
