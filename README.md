@@ -323,6 +323,27 @@ func updateWidgetWhenChanged(_ request: QuotesRequest, completion: @escaping (Re
 var optedIn: WFPOptedIn?
 ```
 
+#### Style Properties
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `backgroundColor` | `UIColor` | `.white` | The view's background color (inherited from UIView) |
+| `normalBackgroundColor` | `UIColor` | Falls back to `backgroundColor` | Background color for normal (unchecked) state |
+| `selectedBackgroundColor` | `UIColor` | Falls back to `backgroundColor` | Background color for selected (checked) state |
+| `disabledBackgroundColor` | `UIColor` | `#F0EFEF` | Background color for disabled (rejected) state |
+| `cornerRadius` | `CGFloat` | `0` | Corner radius for the widget |
+| `showDisclaimer` | `Bool` | Per brand default | Whether to show the disclaimer text. Defaults to `false` for EBTH, `true` for others |
+
+```swift
+// Example: customize widget appearance
+wfpView.backgroundColor = UIColor(hex: "#F5F5F5")
+wfpView.normalBackgroundColor = UIColor(hex: "#FFFFFF")
+wfpView.selectedBackgroundColor = UIColor(hex: "#E8F5E9")
+wfpView.disabledBackgroundColor = UIColor(hex: "#F0EFEF")
+wfpView.cornerRadius = 8
+wfpView.showDisclaimer = false
+```
+
 ### SeelPDPBannerView
 
 #### Methods
