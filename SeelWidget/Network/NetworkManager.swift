@@ -174,4 +174,33 @@ extension NetworkManager {
         }
     }
     
+    /// POST /v1/ecommerce/user-configs/{user_id}
+    /// Fire-and-forget: logs result but does not surface it to the caller.
+    public func postUserConfig(merchantID: String, userID: String, optedOut: Bool) {
+        do {
+            let configuration = try createDefaultConfiguration()
+            let request = Request(configuration: configuration)
+            let body = UserConfigRequest(merchantID: merchantID, optedOut: optedOut)
+            guard let parameters = body.toDictionary() else { return }
+            let url = buildURL(endpoint: "/v1/ecommerce/user-configs/\(userID)")
+
+            request.requestData(url: url, method: .POST, parameters: parameters) { result in
+                DispatchQueue.main.async {
+                    guard SeelWidgetSDK.shared.environment != .production else { return }
+                    switch result {
+                    case .success(let data):
+                        let json = String(data: data, encoding: .utf8) ?? "(empty)"
+                        print("[SeelWidgetSDK] postUserConfig response => \(json)")
+                    case .failure(let error):
+                        print("[SeelWidgetSDK] postUserConfig failed => \(error)")
+                    }
+                }
+            }
+        } catch {
+            if SeelWidgetSDK.shared.environment != .production {
+                print("[SeelWidgetSDK] postUserConfig config error => \(error)")
+            }
+        }
+    }
+    
 }

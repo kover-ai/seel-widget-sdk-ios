@@ -151,6 +151,7 @@ extension SeelWFPView {
             infoViewController.noNeedClicked = { [weak self, weak infoViewController] in
                 self?.updateLocalOptedIn(false)
                 _ = self?.turnOnIfNeed(false)
+                self?.postOptOutUserConfig()
                 infoViewController?.dismiss(animated: true)
             }
             infoViewController.privacyPolicyClicked = { [weak self, weak infoViewController] in
@@ -182,8 +183,28 @@ extension SeelWFPView {
         toggleIsOn = isOn
         updateLocalOptedIn(isOn)
         _ = optedChanged(isOn)
+
+        if !isOn {
+            postOptOutUserConfig()
+        }
     }
     
+    /// POST /v1/ecommerce/user-configs/{user_id} when the user opts out (unchecks).
+    /// Currently only enabled for EBTH platform (type == "ebth-wfp").
+    /// Requires both merchant_id and customer.customer_id from the latest quote response.
+    private func postOptOutUserConfig() {
+        guard quoteResponse?.type == "ebth-wfp" else { return }
+        guard let merchantID = quoteResponse?.merchantID,
+              let userID = quoteResponse?.customer?.customerID,
+              !merchantID.isEmpty,
+              !userID.isEmpty else {
+            sdkDebugLog("postOptOutUserConfig skipped => missing merchant_id or customer_id")
+            return
+        }
+        sdkDebugLog("postOptOutUserConfig => merchant_id: \(merchantID), user_id: \(userID), opted_out: true")
+        NetworkManager.shared.postUserConfig(merchantID: merchantID, userID: userID, optedOut: true)
+    }
+
     func openUrl(_ url: URL, base: UIViewController) {
         let webViewController = SeelWebViewController(url: url)
         webViewController.modalPresentationStyle = .fullScreen
