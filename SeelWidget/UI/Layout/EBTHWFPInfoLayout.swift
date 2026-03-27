@@ -259,7 +259,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         )
         let supportCard = buildFeatureCard(
             iconName: "headphones",
-            title: "24/7 Support",
+            title: "24/7 Support by Seel",
             detail: "Get help anytime with fast response"
         )
         featureRow.addArrangedSubview(resolutionCard)
