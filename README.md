@@ -1,5 +1,7 @@
 # SeelWidget SDK
 
+> **Integrators:** before submitting to the App Store, read **[PRIVACY.md](PRIVACY.md)** — it lists every field this SDK transmits, so you can complete your App Privacy questionnaire accurately. Apple requires your app's privacy disclosure to cover data collected by third-party SDKs.
+
 ## Requirements
 
 - iOS 12.0+
@@ -20,7 +22,7 @@ Alternatively, you can add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", exact: "1.0.0")
+    .package(url: "https://github.com/kover-ai/seel-widget-sdk-ios.git", exact: "1.0.1")
 ]
 ```
 
@@ -29,7 +31,7 @@ dependencies: [
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'SeelWidget', '1.0.0'
+pod 'SeelWidget', '1.0.1'
 ```
 
 Then run:
