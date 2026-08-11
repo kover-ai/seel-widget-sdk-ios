@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SeelWidget'
-  s.version          = '1.0.0'
+  s.version          = '1.0.1'
   s.summary          = 'Seel Widget SDK for iOS provides protection services for e-commerce.'
 
 # This description is used to generate tags and improve search results.
@@ -34,9 +34,19 @@ Seel Widget SDK for iOS allows merchants to integrate Seel's protection services
   s.source_files = 'SeelWidget/**/*.swift'
   # s.source_files = 'SeelWidget/UI/**/*.swift'
   
+  # PrivacyInfo.xcprivacy 必须显式列出：它不在 Assets/ 下，后缀也不在图片白名单里，
+  # 只靠上面那条 glob 会导致 CocoaPods 集成的客户完全拿不到隐私清单。
   s.resource_bundles = {
-    'SeelWidget' => ['SeelWidget/Assets/**/*.{png,jpg,jpeg,svg,xcassets}']
+    'SeelWidget' => [
+      'SeelWidget/Assets/**/*.{png,jpg,jpeg,svg,xcassets}',
+      'SeelWidget/PrivacyInfo.xcprivacy'
+    ]
   }
+
+  # pod install 的清理阶段只保留 readme* / licen[cs]e* / source_files / resources /
+  # preserve_paths（见 cocoapods/sandbox/file_accessor.rb 的 all_files）。
+  # 隐私说明文档不匹配前两者，不在此列出会被从 Pods/ 目录删除，接入方就看不到了。
+  s.preserve_paths = 'PRIVACY.md', 'PRIVACY.zh-CN.md'
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
