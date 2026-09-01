@@ -16,7 +16,11 @@ class ViewController: UIViewController {
     
     private lazy var debugContainer: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        if #available(iOS 13.0, *) {
+            v.backgroundColor = .systemBackground
+        } else {
+            v.backgroundColor = .white
+        }
         v.layer.cornerRadius = 12
         v.layer.shadowColor = UIColor.black.cgColor
         v.layer.shadowOpacity = 0.1
@@ -81,6 +85,34 @@ class ViewController: UIViewController {
         return btn
     }()
     
+    private lazy var themeModeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Theme"
+        label.font = .systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .gray
+        return label
+    }()
+
+    private lazy var themeModeSegment: UISegmentedControl = {
+        let segment = UISegmentedControl(items: ["Light", "Dark", "Auto"])
+        segment.selectedSegmentIndex = 2
+        segment.addTarget(self, action: #selector(themeModeChanged), for: .valueChanged)
+        return segment
+    }()
+
+    private lazy var customThemeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Custom theme"
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        return label
+    }()
+
+    private lazy var customThemeSwitch: UISwitch = {
+        let s = UISwitch()
+        s.addTarget(self, action: #selector(customThemeChanged), for: .valueChanged)
+        return s
+    }()
+
     private lazy var pdpBannerView: SeelPDPBannerView = {
         let banner = SeelPDPBannerView(frame: .zero)
         return banner
@@ -88,7 +120,7 @@ class ViewController: UIViewController {
     
     private lazy var wfpView: SeelWFPView = {
         let wfpView = SeelWFPView(frame: .zero)
-        wfpView.backgroundColor = .white
+        // 不再写死 .white：留给 SDK 主题决定，才能看到深色模式效果
         wfpView.cornerRadius = 8
         return wfpView
     }()
@@ -256,7 +288,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        view.backgroundColor = .lightGray
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemGroupedBackground
+        } else {
+            view.backgroundColor = .lightGray
+        }
         
         view.addSubview(pdpBannerView)
         view.addSubview(wfpView)
@@ -268,6 +304,10 @@ class ViewController: UIViewController {
             debugContainer.addSubview(wfpOffButton)
             debugContainer.addSubview(rejectedButton)
             debugContainer.addSubview(freeReturnButton)
+            debugContainer.addSubview(themeModeLabel)
+            debugContainer.addSubview(themeModeSegment)
+            debugContainer.addSubview(customThemeLabel)
+            debugContainer.addSubview(customThemeSwitch)
             
             // setupButton, updateButton, eventButton, cleanButton, loadingIndicator, cacheInfoLabel, dividingLine
             // are NOT added when type == "ebth-wfp"
@@ -346,7 +386,28 @@ class ViewController: UIViewController {
             freeReturnButton.snp.makeConstraints { make in
                 make.top.equalTo(rejectedButton.snp.bottom).offset(12)
                 make.left.equalToSuperview().offset(16)
+            }
+
+            themeModeLabel.snp.makeConstraints { make in
+                make.top.equalTo(freeReturnButton.snp.bottom).offset(20)
+                make.left.equalToSuperview().offset(16)
+            }
+
+            themeModeSegment.snp.makeConstraints { make in
+                make.top.equalTo(themeModeLabel.snp.bottom).offset(8)
+                make.left.equalToSuperview().offset(16)
+                make.right.equalToSuperview().offset(-16)
+            }
+
+            customThemeLabel.snp.makeConstraints { make in
+                make.top.equalTo(themeModeSegment.snp.bottom).offset(12)
+                make.left.equalToSuperview().offset(16)
                 make.bottom.equalToSuperview().offset(-16)
+            }
+
+            customThemeSwitch.snp.makeConstraints { make in
+                make.centerY.equalTo(customThemeLabel)
+                make.right.equalToSuperview().offset(-16)
             }
             
             loadingIndicator.snp.makeConstraints { make in
@@ -475,6 +536,38 @@ class ViewController: UIViewController {
         return formatter.string(from: date)
     }
     
+    @objc private func themeModeChanged() {
+        switch themeModeSegment.selectedSegmentIndex {
+        case 0: SeelWidgetSDK.shared.themeMode = .light
+        case 1: SeelWidgetSDK.shared.themeMode = .dark
+        default: SeelWidgetSDK.shared.themeMode = .auto
+        }
+    }
+
+    @objc private func customThemeChanged() {
+        guard customThemeSwitch.isOn else {
+            SeelWidgetSDK.shared.resetTheme()
+            return
+        }
+        // 浅色 / 深色各注入一套品牌配色，未指定的字段仍用 SDK 内置值
+        SeelWidgetSDK.shared.setTheme(SeelTheme(
+            primaryColor: UIColor(red: 0.85, green: 0.33, blue: 0.16, alpha: 1),
+            backgroundColor: UIColor(red: 0.99, green: 0.96, blue: 0.92, alpha: 1),
+            cardBackgroundColor: UIColor(red: 0.98, green: 0.93, blue: 0.86, alpha: 1),
+            ctaBackgroundColor: UIColor(red: 0.85, green: 0.33, blue: 0.16, alpha: 1),
+            ctaTextColor: .white,
+            cornerRadius: 12
+        ), for: .light)
+        SeelWidgetSDK.shared.setTheme(SeelTheme(
+            primaryColor: UIColor(red: 1.00, green: 0.55, blue: 0.35, alpha: 1),
+            backgroundColor: UIColor(red: 0.13, green: 0.10, blue: 0.08, alpha: 1),
+            cardBackgroundColor: UIColor(red: 0.20, green: 0.15, blue: 0.12, alpha: 1),
+            ctaBackgroundColor: UIColor(red: 1.00, green: 0.55, blue: 0.35, alpha: 1),
+            ctaTextColor: .black,
+            cornerRadius: 12
+        ), for: .dark)
+    }
+
     @objc func countChanged() {
         countValueLabel.text = String(Int(countStepper.value))
     }
