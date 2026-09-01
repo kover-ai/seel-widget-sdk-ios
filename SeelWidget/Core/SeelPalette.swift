@@ -183,6 +183,21 @@ extension SeelPalette {
         return palette
     }
 
+    /// 「增强对比度」开启时的配色调整。
+    ///
+    /// 系统这个开关的语义是「把弱对比的元素调强」，所以这里把三级灰阶向主文本色收敛、
+    /// 把分割线换成更实的边框色。不改品牌色与背景色——那属于视觉设计，不是可读性问题。
+    func increasingContrast() -> SeelPalette {
+        var palette = self
+        palette.secondaryText = primaryText
+        palette.tertiaryText = primaryText
+        palette.disclaimerText = primaryText
+        palette.linkText = primaryText
+        palette.separator = border
+        palette.iconMutedTint = iconTint
+        return palette
+    }
+
     /// 把浅色 / 深色两套配色合成为最终生效的配色。
     ///
     /// `auto` 模式下每个色值都是 iOS 13 的动态色，系统外观切换时由 UIKit 自动重新解析；

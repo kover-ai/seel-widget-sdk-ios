@@ -29,6 +29,10 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         overlayTap.addTarget(overlayTarget, action: #selector(ClosureTarget.invoke))
         objc_setAssociatedObject(dimOverlay, "overlayTarget", overlayTarget, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         
+        // 遮罩本身是可点关闭的，但它铺满全屏；对读屏隐藏，
+        // 关闭动作由右上角的关闭按钮承担，避免整屏变成一个巨大的"按钮"。
+        dimOverlay.markAsSeelDecoration()
+
         dimOverlay.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -39,6 +43,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         sheetContainer.layer.cornerRadius = 16
         sheetContainer.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         sheetContainer.clipsToBounds = true
+        sheetContainer.accessibilityViewIsModal = true
         view.addSubview(sheetContainer)
         
         sheetContainer.snp.makeConstraints { make in
@@ -69,6 +74,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         contentView.addSubview(headerContainer)
         
         let backgroundImageView = UIImageView()
+        backgroundImageView.markAsSeelDecoration()
         backgroundImageView.contentMode = .scaleAspectFill
         backgroundImageView.clipsToBounds = true
         backgroundImageView.image = UIImage(swName: "background_image")
@@ -83,25 +89,30 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let seelLogoIcon = UIImageView()
         seelLogoIcon.contentMode = .scaleAspectFit
         seelLogoIcon.image = UIImage(swName: "seel_logo")
+        seelLogoIcon.markAsSeelDecoration()
         headerContainer.addSubview(seelLogoIcon)
         
         let closeButton = UIButton(type: .custom)
         closeButton.setImage(UIImage(swName: "close_white") ?? UIImage(swName: "button_close_background"), for: .normal)
         closeButton.tintColor = .white
         closeButton.addTapHandler { actions.onClose() }
+        closeButton.accessibilityLabel = seelText(.a11yCloseLabel)
+        closeButton.accessibilityTraits = .button
         headerContainer.addSubview(closeButton)
         
         let headerTitleLabel = UILabel()
-        headerTitleLabel.text = "We've Got You Covered"
-        headerTitleLabel.font = .systemFont(ofSize: 20, weight: .heavy)// 800
+        headerTitleLabel.text = seelText(.coverageTitle)
+        headerTitleLabel.font = SeelFont.scaled(20, weight: .heavy)// 800
         headerTitleLabel.textColor = .white
         headerTitleLabel.numberOfLines = 0
         headerContainer.addSubview(headerTitleLabel)
         
         let headerSubtitleLabel = UILabel()
         let priceText = formatMoney(quoteResponse?.price, currency: quoteResponse?.currency)
-        headerSubtitleLabel.text = quoteResponse?.price != nil ? "Only \(priceText) for Complete Peace of Mind" : ""
-        headerSubtitleLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        headerSubtitleLabel.text = quoteResponse?.price != nil
+            ? seelText(.pricingMessage, ["price": priceText])
+            : ""
+        headerSubtitleLabel.font = SeelFont.scaled(16, weight: .medium)
         headerSubtitleLabel.textColor = UIColor.white
         headerSubtitleLabel.numberOfLines = 0
         headerContainer.addSubview(headerSubtitleLabel)
@@ -109,7 +120,11 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let headerHeight = max(180, UIScreen.main.bounds.height * 0.20)
         headerContainer.snp.makeConstraints { make in
             make.top.left.right.equalToSuperview()
-            make.height.equalTo(headerHeight)
+            // 默认就是这个高度；降一档优先级，只有大字号下文字放不下时
+            // 才被下面副标题的约束顶开。
+            // 不能直接写成 greaterThanOrEqualTo：那样高度失去确定值，
+            // header 会被撑大，scaleAspectFill 的背景图跟着放大变形。
+            make.height.equalTo(headerHeight).priority(.high)
         }
         backgroundImageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -136,6 +151,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         headerSubtitleLabel.snp.makeConstraints { make in
             make.left.right.equalTo(headerTitleLabel)
             make.top.equalTo(headerTitleLabel.snp.bottom).offset(24)
+            // 由副标题把 header 撑开：白卡片会往上盖 20pt，这里留出余量。
+            make.bottom.lessThanOrEqualToSuperview().offset(-44)
         }
         
         // MARK: - White Card (with optional blur)
@@ -169,8 +186,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - "Worry-Free Purchase®" Title
         let wfpTitleLabel = UILabel()
-        wfpTitleLabel.text = quoteResponse?.extraInfo?.widgetTitle ?? ""
-        wfpTitleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
+        wfpTitleLabel.text = seelServerText(quoteResponse?.extraInfo?.widgetTitle) ?? ""
+        wfpTitleLabel.font = SeelFont.scaled(20, weight: .semibold)
         wfpTitleLabel.textColor = seelTheme.primaryText
         wfpTitleLabel.textAlignment = .center
         whiteCard.addSubview(wfpTitleLabel)
@@ -198,14 +215,15 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         coverageCard.addSubview(coverageHeaderSV)
         
         let shieldIcon = UIImageView()
+        shieldIcon.markAsSeelDecoration()
         shieldIcon.image = seelThemedIcon("accredited")
         shieldIcon.tintColor = seelTheme.iconTint
         shieldIcon.contentMode = .scaleAspectFit
         coverageHeaderSV.addArrangedSubview(shieldIcon)
         
         let coverageHeaderLabel = UILabel()
-        coverageHeaderLabel.text = "What's Covered"
-        coverageHeaderLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        coverageHeaderLabel.text = seelText(.whatsCoveredTitle)
+        coverageHeaderLabel.font = SeelFont.scaled(16, weight: .semibold)
         coverageHeaderLabel.textColor = seelTheme.primaryText
         coverageHeaderSV.addArrangedSubview(coverageHeaderLabel)
         
@@ -219,7 +237,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
-            make.height.equalTo(32)
+            // 大字号下这一行会长高，写死高度会把标题裁掉。
+            make.height.greaterThanOrEqualTo(32)
         }
         
         let coverageItemsSV = UIStackView()
@@ -234,7 +253,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.bottom.equalToSuperview().offset(-20)
         }
         
-        let coverageTexts = quoteResponse?.extraInfo?.coverageDetailsText ?? []
+        let coverageTexts = (quoteResponse?.extraInfo?.coverageDetailsText ?? []).compactMap { seelServerText($0) }
         for text in coverageTexts {
             let itemView = buildCoverageItem(text: text)
             coverageItemsSV.addArrangedSubview(itemView)
@@ -254,13 +273,13 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         let resolutionCard = buildFeatureCard(
             iconName: "bolt",
-            title: "Instant Resolution",
-            detail: "Quick resolution in just a few clicks"
+            title: seelText(.instantResolutionTitle),
+            detail: seelText(.instantResolutionDescription)
         )
         let supportCard = buildFeatureCard(
             iconName: "headphones",
-            title: "24/7 Support by Seel",
-            detail: "Get help anytime with fast response"
+            title: seelText(.supportTitle),
+            detail: seelText(.supportDescription)
         )
         featureRow.addArrangedSubview(resolutionCard)
         featureRow.addArrangedSubview(supportCard)
@@ -278,18 +297,18 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         }
         
         let optInButton = UIButton(type: .custom)
-        optInButton.setTitle("Secure Your Purchase Now", for: .normal)
+        optInButton.setTitle(seelText(.ctaSecurePurchase), for: .normal)
         optInButton.setTitleColor(seelTheme.onCTAText, for: .normal)
-        optInButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        optInButton.titleLabel?.font = SeelFont.scaled(14, weight: .semibold)
         optInButton.backgroundColor = seelTheme.emphasisCTABackground
         optInButton.layer.cornerRadius = 10
         optInButton.addTapHandler { actions.onOptIn() }
         footerContainer.addSubview(optInButton)
         
         let noNeedButton = UIButton(type: .custom)
-        noNeedButton.setTitle("Continue Without Protection", for: .normal)
+        noNeedButton.setTitle(seelText(.ctaContinueWithout), for: .normal)
         noNeedButton.setTitleColor(seelTheme.disclaimerText, for: .normal)
-        noNeedButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        noNeedButton.titleLabel?.font = SeelFont.scaled(14, weight: .semibold)
         noNeedButton.addTapHandler { actions.onNoNeed() }
         footerContainer.addSubview(noNeedButton)
         
@@ -303,8 +322,8 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         linksStack.axis = .horizontal
         linksStack.spacing = 16
         
-        let privacyButton = buildUnderlineButton(title: "Privacy Policy") { actions.onPrivacyPolicy() }
-        let termsButton = buildUnderlineButton(title: "Terms of Service") { actions.onTerms() }
+        let privacyButton = buildUnderlineButton(title: seelText(.privacyPolicy)) { actions.onPrivacyPolicy() }
+        let termsButton = buildUnderlineButton(title: seelText(.termsOfService)) { actions.onTerms() }
         linksStack.addArrangedSubview(privacyButton)
         linksStack.addArrangedSubview(termsButton)
         
@@ -312,16 +331,23 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         poweredBySV.axis = .horizontal
         poweredBySV.spacing = 2
         poweredBySV.alignment = .center
+        // "Powered by {{seel}}"：品牌名加粗，其余常规。
+        // 走模板而不是两个写死顺序的 label，词序才能跟着语言走。
         let poweredByLabel = UILabel()
-        poweredByLabel.text = "Powered By"
-        poweredByLabel.font = .systemFont(ofSize: 10, weight: .regular)
-        poweredByLabel.textColor = seelTheme.primaryText
-        let seelTextLabel = UILabel()
-        seelTextLabel.text = "Seel"
-        seelTextLabel.font = .systemFont(ofSize: 10, weight: .bold)
-        seelTextLabel.textColor = seelTheme.primaryText
+        poweredByLabel.attributedText = seelComposedText(
+            .poweredBy,
+            segments: [
+                "seel": (SeelStringKey.brandName, [
+                    .font: SeelFont.scaled(10, weight: .bold),
+                    .foregroundColor: seelTheme.primaryText,
+                ]),
+            ],
+            defaultAttributes: [
+                .font: SeelFont.scaled(10, weight: .regular),
+                .foregroundColor: seelTheme.primaryText,
+            ]
+        )
         poweredBySV.addArrangedSubview(poweredByLabel)
-        poweredBySV.addArrangedSubview(seelTextLabel)
         
         bottomRow.addArrangedSubview(linksStack)
         bottomRow.addArrangedSubview(poweredBySV)
@@ -329,7 +355,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         // Footer constraints
         optInButton.snp.makeConstraints { make in
             make.top.left.right.equalToSuperview()
-            make.height.equalTo(52)
+            make.height.greaterThanOrEqualTo(52)
         }
         noNeedButton.snp.makeConstraints { make in
             make.top.equalTo(optInButton.snp.bottom).offset(12)
@@ -360,6 +386,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let container = UIView()
         
         let checkIcon = UIImageView()
+        checkIcon.markAsSeelDecoration()
         checkIcon.image = UIImage(swName: "icon_check_selected_black")
         checkIcon.tintColor = seelTheme.success
         checkIcon.contentMode = .scaleAspectFit
@@ -373,14 +400,14 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             let attr = NSMutableAttributedString(
                 string: parts[0],
                 attributes: [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
+                    .font: SeelFont.scaled(14, weight: .semibold),
                     .foregroundColor: seelTheme.primaryText
                 ]
             )
             attr.append(NSAttributedString(
                 string: " - " + parts.dropFirst().joined(separator: " - "),
                 attributes: [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .medium),
+                    .font: SeelFont.scaled(14, weight: .medium),
                     .foregroundColor: seelTheme.primaryText
                 ]
             ))
@@ -391,21 +418,21 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
                 let attr = NSMutableAttributedString(
                     string: dashParts[0],
                     attributes: [
-                        .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
+                        .font: SeelFont.scaled(14, weight: .semibold),
                         .foregroundColor: seelTheme.primaryText
                     ]
                 )
                 attr.append(NSAttributedString(
                     string: " – " + dashParts.dropFirst().joined(separator: " – "),
                     attributes: [
-                        .font: UIFont.systemFont(ofSize: 14, weight: .medium),
+                        .font: SeelFont.scaled(14, weight: .medium),
                         .foregroundColor: seelTheme.primaryText
                     ]
                 ))
                 label.attributedText = attr
             } else {
                 label.text = text
-                label.font = .systemFont(ofSize: 14)
+                label.font = SeelFont.scaled(14)
                 label.textColor = seelTheme.primaryText
             }
         }
@@ -418,7 +445,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.bottom.equalToSuperview()
         }
         
-        let font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        let font = SeelFont.scaled(14, weight: .semibold)
         let firstLineCenter = font.ascender / 2
         checkIcon.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(7)
@@ -435,6 +462,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         card.layer.cornerRadius = 10
         
         let iconView = UIImageView()
+        iconView.markAsSeelDecoration()
         iconView.image = seelThemedIcon(iconName)
         iconView.tintColor = seelTheme.iconTint
         iconView.contentMode = .scaleAspectFit
@@ -442,14 +470,14 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        titleLabel.font = SeelFont.scaled(16, weight: .semibold)
         titleLabel.textColor = seelTheme.primaryText
         titleLabel.numberOfLines = 0
         card.addSubview(titleLabel)
         
         let detailLabel = UILabel()
         detailLabel.text = detail
-        detailLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        detailLabel.font = SeelFont.scaled(14, weight: .regular)
         detailLabel.textColor = seelTheme.primaryText
         detailLabel.numberOfLines = 0
         card.addSubview(detailLabel)
@@ -477,7 +505,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             string: title,
             attributes: [
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .font: UIFont.systemFont(ofSize: 11, weight: .regular),
+                .font: SeelFont.scaled(11, weight: .regular),
                 .foregroundColor: seelTheme.linkText
             ]
         )

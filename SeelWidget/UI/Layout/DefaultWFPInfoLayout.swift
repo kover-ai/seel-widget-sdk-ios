@@ -14,13 +14,14 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Navigation Bar
         let navigationBar = SeelNavigationBar()
-        navigationBar.title = quoteResponse?.extraInfo?.widgetTitle
+        navigationBar.title = seelServerText(quoteResponse?.extraInfo?.widgetTitle)
         
         let closeButton = UIButton(type: .custom)
-        closeButton.setTitle("Close", for: .normal)
+        closeButton.setTitle(seelText(.close), for: .normal)
         closeButton.setTitleColor(seelTheme.primaryText, for: .normal)
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .light)
+        closeButton.titleLabel?.font = SeelFont.scaled(17, weight: .light)
         closeButton.addTapHandler { actions.onClose() }
+        closeButton.accessibilityLabel = seelText(.a11yCloseLabel)
         navigationBar.rightBarButtonItems = [closeButton]
         
         // MARK: - Scroll Content
@@ -34,13 +35,13 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         let contentView = UIView()
         
         let wfpView = CoverageTitleView()
-        wfpView.title = quoteResponse?.extraInfo?.widgetTitle
+        wfpView.title = seelServerText(quoteResponse?.extraInfo?.widgetTitle)
         wfpView.price = quoteResponse?.price
         wfpView.currency = quoteResponse?.currency
         wfpView.updateViews()
         
         let seelLabel = UILabel()
-        let seelFullText = "What's Covered by Seel"
+        let seelFullText = seelText(.whatsCoveredBySeel)
         let seelKeyword = "Seel"
         let attributedText = NSMutableAttributedString(string: seelFullText)
         let nsFullText = seelFullText as NSString
@@ -50,7 +51,7 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
             attributedText.addAttribute(.foregroundColor, value: seelTheme.primary, range: seelRange)
         }
         seelLabel.attributedText = attributedText
-        seelLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        seelLabel.font = SeelFont.scaled(16, weight: .semibold)
         
         let coverageDetailsView = CoverageDetailsView(frame: .zero)
         coverageDetailsView.quoteResponse = quoteResponse

@@ -28,28 +28,28 @@ final class CoverageTipsView: UIView {
     }
     
     func configViews() {
-        resolutionTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        resolutionTitleLabel.font = SeelFont.scaled(16, weight: .medium)
         resolutionTitleLabel.textColor = seelTheme.primaryText
         resolutionTitleLabel.numberOfLines = 0
-        resolutionTitleLabel.text = "Easy Resolution"
+        resolutionTitleLabel.text = seelText(.easyResolution)
         
-        resolutionDetailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        resolutionDetailLabel.font = SeelFont.scaled(14, weight: .regular)
         resolutionDetailLabel.textColor = seelTheme.secondaryText
         resolutionDetailLabel.numberOfLines = 0
-        resolutionDetailLabel.text = "Resolve your issues with just a few clicks"
+        resolutionDetailLabel.text = seelText(.resolveWithClicks)
         
-        peaceTipTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        peaceTipTitleLabel.font = SeelFont.scaled(16, weight: .medium)
         peaceTipTitleLabel.textColor = seelTheme.primaryText
         peaceTipTitleLabel.numberOfLines = 0
-        peaceTipTitleLabel.text = "Complete Peace of Mind"
+        peaceTipTitleLabel.text = seelText(.completePeaceOfMind)
         
-        peaceTipDetailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        peaceTipDetailLabel.font = SeelFont.scaled(14, weight: .regular)
         peaceTipDetailLabel.textColor = seelTheme.secondaryText
         peaceTipDetailLabel.numberOfLines = 0
-        peaceTipDetailLabel.text = """
-• Zero-risk on your order with our protection
-• Get your refund promptly
-"""
+        peaceTipDetailLabel.text = [
+            "\u{2022} " + seelText(.zeroRisk),
+            "\u{2022} " + seelText(.getRefundPromptly),
+        ].joined(separator: "\n")
         
         resolutionTitleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()

@@ -69,7 +69,7 @@ public final class SeelWFPView: UIView {
     private var toggleIsOn: Bool = true
     private var layoutProvider: WFPWidgetLayoutProvider?
     private var latestRequestToken: Int = 0
-    private var themeObserver: SeelThemeObserver?
+    private var themeObserver: SeelUIRefreshObserver?
     /// 最近一次由主题写入的背景色，用来判断宿主是否自己改过 backgroundColor。
     private var themeAppliedBackgroundColor: UIColor?
 
@@ -80,7 +80,7 @@ public final class SeelWFPView: UIView {
         applyCornerRadius()
         applyThemeBorder()
         buildDefaultLayout()
-        themeObserver = SeelThemeObserver { [weak self] in self?.applyTheme() }
+        themeObserver = SeelUIRefreshObserver { [weak self] in self?.applyTheme() }
     }
 
     required init?(coder: NSCoder) {
@@ -292,6 +292,9 @@ extension SeelWFPView {
                        let responseJSON = String(data: responseData, encoding: .utf8) {
                         self.sdkDebugLog("quote response json => \(responseJSON)")
                     }
+
+                    // 报价里可能带该笔订单的译文，先入库再渲染，避免先英文后跳变。
+                    SeelI18nManager.shared.apply(quoteI18n: value.extraInfo?.i18n)
 
                     let previousType = self.quoteResponse?.type
                     self.quoteResponse = value

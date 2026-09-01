@@ -15,20 +15,20 @@ final class CoverageInfoFooter: UIView {
     private lazy var optedInButton: UIButton = {
         let button = UIButton(type: .custom)
         button.contentEdgeInsets = .init(top: 0, left: 16, bottom: 0, right: 16)
-        button.setTitle("Opt-In Now for Full Protection", for: .normal)
+        button.setTitle(seelText(.optInNowForFullProtection), for: .normal)
         button.setTitleColor(seelTheme.onCTAText, for: .normal)
         button.addTarget(self, action: #selector(optedInButtonClicked), for: .touchUpInside)
         button.backgroundColor = seelTheme.ctaBackground
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        button.titleLabel?.font = SeelFont.scaled(12, weight: .semibold)
         return button
     }()
     
     private lazy var noNeedButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle("No Need", for: .normal)
+        button.setTitle(seelText(.noNeed), for: .normal)
         button.setTitleColor(seelTheme.secondaryText, for: .normal)
         button.addTarget(self, action: #selector(noNeedButtonClicked), for: .touchUpInside)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        button.titleLabel?.font = SeelFont.scaled(14, weight: .regular)
         return button
     }()
     
@@ -42,26 +42,26 @@ final class CoverageInfoFooter: UIView {
     private lazy var privacyPolicyButton: UIButton = {
         let button = UIButton(type: .custom)
         let attributedString = NSAttributedString(
-            string: "Privacy Policy",
+            string: seelText(.privacyPolicy),
             attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]
         )
         button.setAttributedTitle(attributedString, for: .normal)
         button.setTitleColor(seelTheme.linkText, for: .normal)
         button.addTarget(self, action: #selector(privacyPolicyButtonClicked), for: .touchUpInside)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        button.titleLabel?.font = SeelFont.scaled(12, weight: .regular)
         return button
     }()
     
     private lazy var termsButton: UIButton = {
         let button = UIButton(type: .custom)
         let attributedString = NSAttributedString(
-            string: "Terms of Service",
+            string: seelText(.termsOfService),
             attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]
         )
         button.setAttributedTitle(attributedString, for: .normal)
         button.setTitleColor(seelTheme.linkText, for: .normal)
         button.addTarget(self, action: #selector(termsButtonClicked), for: .touchUpInside)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        button.titleLabel?.font = SeelFont.scaled(12, weight: .regular)
         return button
     }()
     
@@ -83,6 +83,12 @@ final class CoverageInfoFooter: UIView {
         stackView.addArrangedSubview(termsButton)
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // 按钮高度会随字号变化，圆角不能写死成 38/2。
+        optedInButton.layer.cornerRadius = optedInButton.bounds.height / 2
+    }
+
     func configViews() {
         optedInButton.layer.cornerRadius = 38 / 2
         optedInButton.backgroundColor = seelTheme.ctaBackground
@@ -90,7 +96,7 @@ final class CoverageInfoFooter: UIView {
         optedInButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(38)
+            make.height.greaterThanOrEqualTo(38)
         }
         noNeedButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()

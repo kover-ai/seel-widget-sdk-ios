@@ -22,7 +22,9 @@ final class SeelWebViewController: UIViewController {
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("←", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
+        // 箭头符号会被读成 "left arrow"，必须给出可读的名字。
+        button.accessibilityLabel = seelText(.a11yBackLabel)
+        button.titleLabel?.font = SeelFont.scaled(20, weight: .medium)
         button.setTitleColor(seelTheme.primaryText, for: .normal)
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         return button
@@ -31,7 +33,7 @@ final class SeelWebViewController: UIViewController {
     // Title label
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        label.font = SeelFont.scaled(18, weight: .semibold)
         label.textColor = seelTheme.primaryText
         label.textAlignment = .center
         return label
@@ -41,7 +43,8 @@ final class SeelWebViewController: UIViewController {
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("✕", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.accessibilityLabel = seelText(.a11yCloseLabel)
+        button.titleLabel?.font = SeelFont.scaled(18, weight: .medium)
         button.setTitleColor(seelTheme.primaryText, for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         return button
@@ -120,7 +123,7 @@ final class SeelWebViewController: UIViewController {
         navigationBar.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
-            make.height.equalTo(44)
+            make.height.greaterThanOrEqualTo(44)
         }
         
         backButton.snp.makeConstraints { make in
@@ -205,7 +208,7 @@ extension SeelWebViewController: WKNavigationDelegate {
         progressView.isHidden = false
         
         // Show default title
-        titleLabel.text = "Loading..."
+        titleLabel.text = seelText(.loading)
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

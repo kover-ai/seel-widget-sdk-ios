@@ -14,9 +14,12 @@ class LoadingAnimationView: UIView {
         setupAnimation()
     }
     
-    private var themeObserver: SeelThemeObserver?
+    private var themeObserver: SeelUIRefreshObserver?
 
     private func setupAnimation() {
+        // 加载占位是纯视觉的，读屏应该跳过。
+        markAsSeelDecoration()
+
         // Set view style
         self.layer.cornerRadius = 4
         self.clipsToBounds = true
@@ -31,7 +34,7 @@ class LoadingAnimationView: UIView {
         
         self.layer.addSublayer(gradientLayer)
         
-        themeObserver = SeelThemeObserver { [weak self] in self?.updateGradientColors() }
+        themeObserver = SeelUIRefreshObserver { [weak self] in self?.updateGradientColors() }
     }
     
     /// CAGradientLayer 只吃 CGColor，动态色必须按当前 trait 解析后再写入，
@@ -59,6 +62,12 @@ class LoadingAnimationView: UIView {
     
     // Start loading animation
     func startAnimating() {
+        // 无限循环的位移动画正是「减弱动态效果」要关掉的东西，
+        // 静态的骨架块同样能表达"加载中"。
+        guard !SeelA11y.isReduceMotionEnabled else {
+            stopAnimating()
+            return
+        }
         let animation = CABasicAnimation(keyPath: "transform.translation.x")
         animation.fromValue = -self.bounds.width * 2
         animation.toValue = 0

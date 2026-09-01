@@ -29,7 +29,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
 
     private lazy var disclaimerLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 11, weight: .regular)
+        label.font = SeelFont.scaled(11, weight: .regular)
         label.textColor = seelTheme.disclaimerText
         label.numberOfLines = 0
         label.isHidden = true
@@ -138,6 +138,11 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
         switcher.isOn = data.toggleIsOn
         checkbox.isOn = data.toggleIsOn
 
+        // 让开关 / 勾选框自己能说清楚勾的是什么。
+        let spokenTitle = seelServerText(quoteResponse?.extraInfo?.widgetTitle) ?? seelText(.productName)
+        switcher.accessibilityLabel = spokenTitle
+        checkbox.accessibilityTitle = spokenTitle
+
         // Detail messages
         let msgs: [String] = quoteResponse?.extraInfo?.displayWidgetText ?? []
         detailSV.isHidden = msgs.isEmpty
@@ -153,7 +158,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
                 view.isHidden = false
                 if let lineView = view as? LineView {
                     lineView.iconImage = msgs.count > 1 ? seelThemedIcon("icon_select", darkTint: \.iconMutedTint) : nil
-                    lineView.content = msgs[index]
+                    lineView.content = seelServerText(msgs[index])
                     lineView.updateViews()
                 }
             } else {
@@ -163,7 +168,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
 
         // Disclaimer
         if data.showDisclaimer,
-           let disclaimer = quoteResponse?.extraInfo?.widgetDisclaimer,
+           let disclaimer = seelServerText(quoteResponse?.extraInfo?.widgetDisclaimer),
            !disclaimer.isEmpty {
             disclaimerLabel.text = disclaimer
             disclaimerLabel.isHidden = false

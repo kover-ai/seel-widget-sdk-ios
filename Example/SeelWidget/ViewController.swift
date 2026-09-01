@@ -85,6 +85,21 @@ class ViewController: UIViewController {
         return btn
     }()
     
+    private lazy var languageLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Language"
+        label.font = .systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .gray
+        return label
+    }()
+
+    private lazy var languageSegment: UISegmentedControl = {
+        let segment = UISegmentedControl(items: ["System", "English", "Français"])
+        segment.selectedSegmentIndex = 0
+        segment.addTarget(self, action: #selector(languageChanged), for: .valueChanged)
+        return segment
+    }()
+
     private lazy var themeModeLabel: UILabel = {
         let label = UILabel()
         label.text = "Theme"
@@ -308,6 +323,8 @@ class ViewController: UIViewController {
             debugContainer.addSubview(themeModeSegment)
             debugContainer.addSubview(customThemeLabel)
             debugContainer.addSubview(customThemeSwitch)
+            debugContainer.addSubview(languageLabel)
+            debugContainer.addSubview(languageSegment)
             
             // setupButton, updateButton, eventButton, cleanButton, loadingIndicator, cacheInfoLabel, dividingLine
             // are NOT added when type == "ebth-wfp"
@@ -402,12 +419,23 @@ class ViewController: UIViewController {
             customThemeLabel.snp.makeConstraints { make in
                 make.top.equalTo(themeModeSegment.snp.bottom).offset(12)
                 make.left.equalToSuperview().offset(16)
-                make.bottom.equalToSuperview().offset(-16)
             }
 
             customThemeSwitch.snp.makeConstraints { make in
                 make.centerY.equalTo(customThemeLabel)
                 make.right.equalToSuperview().offset(-16)
+            }
+
+            languageLabel.snp.makeConstraints { make in
+                make.top.equalTo(customThemeLabel.snp.bottom).offset(20)
+                make.left.equalToSuperview().offset(16)
+            }
+
+            languageSegment.snp.makeConstraints { make in
+                make.top.equalTo(languageLabel.snp.bottom).offset(8)
+                make.left.equalToSuperview().offset(16)
+                make.right.equalToSuperview().offset(-16)
+                make.bottom.equalToSuperview().offset(-16)
             }
             
             loadingIndicator.snp.makeConstraints { make in
@@ -507,13 +535,18 @@ class ViewController: UIViewController {
             print("optedIn:\(optedIn) price:\(quote?.price ?? 0)")
             self?.updateViews()
         }
-        SeelWidgetSDK.shared.configure(apiKey: TestDatas.apiKey, environment: .development)
+        SeelWidgetSDK.shared.configure(
+            apiKey: TestDatas.apiKey,
+            environment: .development,
+            adminDomain: TestDatas.adminDomain
+        )
         pdpBannerView.setup(type: type, style: PDPBannerStyle(
             padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12),
             cornerRadius: 6
         ))
         
         updateViews()
+
     }
     
     func updateViews() {
@@ -536,6 +569,15 @@ class ViewController: UIViewController {
         return formatter.string(from: date)
     }
     
+    @objc private func languageChanged() {
+        switch languageSegment.selectedSegmentIndex {
+        case 1: SeelWidgetSDK.shared.language = "en-US"
+        case 2: SeelWidgetSDK.shared.language = "fr-FR"
+        default: SeelWidgetSDK.shared.language = nil   // 跟随系统
+        }
+        print("resolved language => \(SeelWidgetSDK.shared.resolvedLanguage)")
+    }
+
     @objc private func themeModeChanged() {
         switch themeModeSegment.selectedSegmentIndex {
         case 0: SeelWidgetSDK.shared.themeMode = .light

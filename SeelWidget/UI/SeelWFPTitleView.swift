@@ -58,12 +58,17 @@ final class SeelWFPTitleView: UIView {
         let infoButton = UIButton(type: .custom)
         infoButton.setImage(seelThemedIcon("info_black", darkTint: \.iconMutedTint), for: .normal)
         infoButton.isEnabled = false
+        // 真正可点的是下面那个 44pt 的扩展按钮，这个只负责画图标。
+        infoButton.markAsSeelDecoration()
         return infoButton
     }()
     
     private lazy var infoExtensionButton: UIButton = {
         let button = UIButton(type: .custom)
         button.addTarget(self, action: #selector(infoButtonClicked), for: .touchUpInside)
+        button.isAccessibilityElement = true
+        button.accessibilityTraits = .button
+        button.accessibilityLabel = seelText(.a11yInfoButtonLabel)
         return button
     }()
     
@@ -82,6 +87,8 @@ final class SeelWFPTitleView: UIView {
     }
     
     func createViews() {
+        seelIcon.markAsSeelDecoration()
+        seelWordIcon.markAsSeelDecoration()
         addSubview(contentSV)
         contentSV.addArrangedSubview(seelIcon)
         contentSV.addArrangedSubview(textSV)
@@ -100,15 +107,17 @@ final class SeelWFPTitleView: UIView {
     }
     
     func configViews() {
-        titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        titleLabel.font = SeelFont.scaled(12, weight: .semibold)
         titleLabel.textColor = seelTheme.primaryText
         
-        priceLabel.text = "for -"
-        priceLabel.font = UIFont.systemFont(ofSize: 10, weight: .regular)
+        priceLabel.font = SeelFont.scaled(10, weight: .regular)
         priceLabel.textColor = seelTheme.primaryText
         
-        poweredLabel.text = "Powered by"
-        poweredLabel.font = UIFont.systemFont(ofSize: 7.5, weight: .semibold)
+        // 品牌名在这里是图片（seel_word），所以只取模板里 {{seel}} 之外的字面量。
+        // 已知限制：若某语言把品牌名放在句首，图片仍在文字之后。
+        poweredLabel.text = seelText(.poweredBy, ["seel": ""])
+            .trimmingCharacters(in: .whitespaces)
+        poweredLabel.font = SeelFont.scaled(7.5, weight: .semibold)
         poweredLabel.textColor = seelTheme.secondaryText
         
         contentSV.snp.makeConstraints { make in
@@ -127,26 +136,72 @@ final class SeelWFPTitleView: UIView {
         }
         infoExtensionButton.snp.makeConstraints { make in
             make.center.equalTo(infoButton)
-            make.width.height.equalTo(36)
+            // HIG 要求可点区域不小于 44pt，图标本身只有 12pt。
+            make.width.height.equalTo(44)
         }
     }
     
     func updateViews() {
-        titleLabel.text = title
-        
-        priceLabel.isHidden = price == nil && !loading
+        let localizedTitle = seelServerText(title) ?? ""
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: SeelFont.scaled(12, weight: .semibold),
+            .foregroundColor: seelTheme.primaryText,
+        ]
+        let priceAttributes: [NSAttributedString.Key: Any] = [
+            .font: SeelFont.scaled(10, weight: .regular),
+            .foregroundColor: seelTheme.primaryText,
+        ]
+
         animationView.isHidden = !loading
         if loading {
-            priceLabel.text = "for"
+            // 加载中价格还没回来，标题与占位骨架分成两个视图，
+            // 中间的连接词从模板里取（把 title / price 替换成空再去掉多余空格）。
+            titleLabel.attributedText = NSAttributedString(string: localizedTitle, attributes: titleAttributes)
+            priceLabel.text = priceConnector()
+            priceLabel.isHidden = false
             animationView.startAnimating()
+        } else if let price = price {
+            // 词序交给模板决定，不要在代码里拼 "标题 + for + 价格"。
+            titleLabel.attributedText = seelComposedText(
+                .wfpTitle,
+                segments: [
+                    "title": (localizedTitle, titleAttributes),
+                    "price": (formatMoney(price, currency: currency), priceAttributes),
+                ],
+                defaultAttributes: priceAttributes
+            )
+            priceLabel.isHidden = true
+            animationView.stopAnimating()
         } else {
-            priceLabel.text = "for \(formatMoney(price, currency: currency))"
+            titleLabel.attributedText = NSAttributedString(string: localizedTitle, attributes: titleAttributes)
+            priceLabel.isHidden = true
             animationView.stopAnimating()
         }
         
         infoButton.isHidden = !showInfo
+        infoExtensionButton.isHidden = !showInfo
         
         detailSV.isHidden = !showPowered
+
+        configureAccessibility()
+    }
+
+    /// 标题、价格、"Powered by" 分散在多个 label 里，
+    /// 合并成一条朗读，并把 info 按钮排在它后面。
+    private func configureAccessibility() {
+        let spoken = [
+            titleLabel.attributedText?.string ?? titleLabel.text,
+            priceLabel.isHidden ? nil : priceLabel.text,
+        ].compactMap { $0 }.filter { !$0.isEmpty }
+
+        textSV.markAsSeelA11yGroup(label: spoken.joined(separator: " "))
+        accessibilityElements = showInfo ? [textSV, infoExtensionButton] : [textSV]
+    }
+
+    /// 模板里连接标题与价格的字面量部分，例如英文的 "for"。
+    private func priceConnector() -> String {
+        seelText(.wfpTitle, ["title": "", "price": ""])
+            .trimmingCharacters(in: .whitespaces)
     }
     
     @objc func infoButtonClicked() {

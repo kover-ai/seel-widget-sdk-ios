@@ -35,6 +35,9 @@ class TestDatas {
     static let cartIdKey = "Seel.CartIdKey"
     
     static let apiKey: String = "yojct9zbwxok8961hr7e1s6i3fgmm1o1"
+
+    /// 店铺的 myshopify 域名，用于拉取 merchant-configs（多语言文案的来源）。
+    static let adminDomain: String = "seel-demo-store.myshopify.com"
     
     class func getQuote(_ accepted: Bool = true, defaultOn: Bool = true, itemCount: Int = 3, error: Bool = false) -> QuotesRequest? {
         let ebthParams: Dictionary<String, Any> = [

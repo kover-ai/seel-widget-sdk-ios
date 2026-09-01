@@ -39,9 +39,10 @@ final class LineView: UIView {
     }
     
     func configViews() {
-        contentLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        contentLabel.font = SeelFont.scaled(12, weight: .medium)
         contentLabel.textColor = seelTheme.secondaryText
         contentLabel.numberOfLines = 0
+        contentLabel.enableSeelDynamicType()
         
         contentSV.snp.makeConstraints { make in
             make.edges.equalTo(UIEdgeInsets.zero)
@@ -56,7 +57,7 @@ final class LineView: UIView {
         icon.image = iconImage
         
         contentLabel.text = content
-        contentLabel.font = contentFont ?? UIFont.systemFont(ofSize: 12, weight: .medium)
+        contentLabel.font = contentFont ?? SeelFont.scaled(12, weight: .medium)
         contentLabel.textColor = contentColor ?? seelTheme.secondaryText
     }
 }

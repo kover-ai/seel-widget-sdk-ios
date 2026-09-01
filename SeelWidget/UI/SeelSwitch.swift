@@ -66,6 +66,7 @@ final class SeelSwitch: UIView {
     }
     
     private func setupUI() {
+        configureAccessibility()
         addSubview(trackView)
         addSubview(thumbView)
         
@@ -98,7 +99,7 @@ final class SeelSwitch: UIView {
     }
     
     private func updateSwitchState() {
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+        let apply = {
             if self.isOn {
                 self.thumbLeadingConstraint?.update(offset: 23) // 50 - 24 - 3
                 self.trackView.backgroundColor = self.onTintColor
@@ -107,7 +108,41 @@ final class SeelSwitch: UIView {
                 self.trackView.backgroundColor = self.trackTintColor
             }
             self.layoutIfNeeded()
-        })
+        }
+
+        updateAccessibilityState()
+
+        // 「减弱动态效果」下直接落位，不做滑动动画。
+        if SeelA11y.isReduceMotionEnabled {
+            apply()
+            return
+        }
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: apply)
+    }
+
+    // MARK: - Accessibility
+
+    /// 这是个纯自绘的开关，不继承 UISwitch，所有语义都得自己给，
+    /// 否则 VoiceOver 既读不出状态也无法激活它。
+    private func configureAccessibility() {
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        accessibilityHint = seelText(.a11yToggleHint)
+        updateAccessibilityState()
+    }
+
+    private func updateAccessibilityState() {
+        accessibilityValue = isOn ? seelText(.a11yOn) : seelText(.a11yOff)
+        if isOn {
+            accessibilityTraits.insert(.selected)
+        } else {
+            accessibilityTraits.remove(.selected)
+        }
+    }
+
+    public override func accessibilityActivate() -> Bool {
+        toggle()
+        return true
     }
     
     private func updateColors() {

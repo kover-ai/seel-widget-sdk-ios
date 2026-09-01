@@ -11,7 +11,7 @@ final class SeelNavigationBar: UIView {
 
     public var titleTextAttributes: [NSAttributedString.Key: Any] = [
         .foregroundColor: seelTheme.primaryText,
-        .font: UIFont.systemFont(ofSize: 17, weight: .medium)
+        .font: SeelFont.scaled(17, weight: .medium)
     ] {
         didSet { applyTitleTextAttributes() }
     }
@@ -155,7 +155,7 @@ final class SeelNavigationBar: UIView {
         if button.constraints.isEmpty {
             button.snp.makeConstraints { make in
                 make.width.greaterThanOrEqualTo(32)
-                make.height.equalTo(32)
+                make.height.greaterThanOrEqualTo(32)
             }
         }
         button.contentEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)

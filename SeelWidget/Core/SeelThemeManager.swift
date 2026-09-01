@@ -7,7 +7,16 @@ public final class SeelThemeManager {
 
     public static let shared = SeelThemeManager()
 
-    private init() {}
+    private init() {
+        // 「增强对比度」是系统级开关，用户在设置里改完切回来时要立刻生效。
+        NotificationCenter.default.addObserver(
+            forName: UIAccessibility.darkerSystemColorsStatusDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.invalidate()
+        }
+    }
 
     // MARK: - 外观模式
 
@@ -71,12 +80,18 @@ public final class SeelThemeManager {
 
     /// 叠加自定义主题后的浅色配色（静态色）。
     var lightPalette: SeelPalette {
-        SeelPalette.lightDefaults.applying(lightOverrides)
+        applyingAccessibilityPreferences(SeelPalette.lightDefaults.applying(lightOverrides))
     }
 
     /// 叠加自定义主题后的深色配色（静态色）。
     var darkPalette: SeelPalette {
-        SeelPalette.darkDefaults.applying(darkOverrides)
+        applyingAccessibilityPreferences(SeelPalette.darkDefaults.applying(darkOverrides))
+    }
+
+    /// 自定义主题之后再叠加系统的无障碍偏好：
+    /// 接入方指定的颜色优先，但用户开了「增强对比度」时可读性优先。
+    private func applyingAccessibilityPreferences(_ palette: SeelPalette) -> SeelPalette {
+        SeelA11y.isIncreaseContrastEnabled ? palette.increasingContrast() : palette
     }
 
     /// 强制模式下 SDK 根视图应使用的 `overrideUserInterfaceStyle`。
@@ -115,26 +130,39 @@ var seelTheme: SeelPalette {
     SeelThemeManager.shared.palette
 }
 
-// MARK: - 主题变更订阅
+// MARK: - 界面刷新订阅
 
-/// 主题变更订阅句柄：持有者释放时自动注销。
-final class SeelThemeObserver {
+/// 界面刷新订阅句柄：持有者释放时自动注销。
+///
+/// 同时监听主题与多语言两类变更——两者都要求视图重新渲染，
+/// 分成两个订阅只会让每个视图都写两遍同样的回调。
+final class SeelUIRefreshObserver {
 
-    private var token: NSObjectProtocol?
+    private var tokens: [NSObjectProtocol] = []
 
-    /// - Parameter handler: 主题变化时在主线程回调，内部请使用 `[weak self]`。
+    /// - Parameter handler: 主题或译文变化时在主线程回调，内部请使用 `[weak self]`。
     init(_ handler: @escaping () -> Void) {
-        token = NotificationCenter.default.addObserver(
-            forName: .SeelThemeDidChange,
-            object: nil,
-            queue: .main
-        ) { _ in
-            handler()
+        // 字号变化同样要求重新布局：SDK 里有大量在构建时写死属性的富文本，
+        // 只靠 adjustsFontForContentSizeCategory 覆盖不全。
+        let names: [Notification.Name] = [
+            .SeelThemeDidChange,
+            .SeelI18nDidChange,
+            UIContentSizeCategory.didChangeNotification,
+        ]
+        for name in names {
+            let token = NotificationCenter.default.addObserver(
+                forName: name,
+                object: nil,
+                queue: .main
+            ) { _ in
+                handler()
+            }
+            tokens.append(token)
         }
     }
 
     deinit {
-        if let token = token {
+        for token in tokens {
             NotificationCenter.default.removeObserver(token)
         }
     }

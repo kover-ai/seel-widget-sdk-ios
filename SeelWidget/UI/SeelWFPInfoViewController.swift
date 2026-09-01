@@ -14,7 +14,7 @@ final class SeelWFPInfoViewController: UIViewController {
     
     private let brandType: String?
 
-    private var themeObserver: SeelThemeObserver?
+    private var themeObserver: SeelUIRefreshObserver?
     
     public init(quoteResponse: QuotesResponse?, brandType: String? = nil) {
         self.quoteResponse = quoteResponse
@@ -30,7 +30,7 @@ final class SeelWFPInfoViewController: UIViewController {
         super.viewDidLoad()
 
         buildLayout()
-        themeObserver = SeelThemeObserver { [weak self] in self?.rebuildLayout() }
+        themeObserver = SeelUIRefreshObserver { [weak self] in self?.rebuildLayout() }
     }
 
     /// 主题切换后整屏重建：弹窗里的颜色都是在构建时写入子视图的。
@@ -51,6 +51,14 @@ final class SeelWFPInfoViewController: UIViewController {
             onTerms: { [weak self] in self?.termsClicked?() }
         )
         layoutProvider.buildLayout(in: self, quoteResponse: quoteResponse, actions: actions)
+
+        // 弹窗盖在宿主页面之上，不隔离的话 VoiceOver 会滑到底下的内容上去。
+        view.accessibilityViewIsModal = true
+    }
+
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        SeelA11y.announceScreenChange(focusing: view)
     }
 
 }

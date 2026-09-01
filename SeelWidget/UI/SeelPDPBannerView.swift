@@ -30,7 +30,7 @@ public struct PDPBannerStyle {
 public final class SeelPDPBannerView: UIView {
 
     private var layoutProvider: PDPBannerLayoutProvider?
-    private var themeObserver: SeelThemeObserver?
+    private var themeObserver: SeelUIRefreshObserver?
     private var currentType: String?
     private var currentStyle = PDPBannerStyle()
 
@@ -53,7 +53,7 @@ public final class SeelPDPBannerView: UIView {
         rebuild()
 
         if themeObserver == nil {
-            themeObserver = SeelThemeObserver { [weak self] in self?.rebuild() }
+            themeObserver = SeelUIRefreshObserver { [weak self] in self?.rebuild() }
         }
     }
 

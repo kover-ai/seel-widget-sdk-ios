@@ -38,7 +38,7 @@ final class CoverageTitleView: UIView {
     }
     
     func configViews() {
-        titleLabel.font = UIFont.systemFont(ofSize: 21, weight: .semibold)
+        titleLabel.font = SeelFont.scaled(21, weight: .semibold)
         titleLabel.textColor = seelTheme.primaryText
         titleLabel.adjustsFontSizeToFitWidth = true
         
@@ -52,13 +52,27 @@ final class CoverageTitleView: UIView {
     }
     
     func updateViews() {
-        let attributedText = NSMutableAttributedString(string: title ?? "")
-        if let _price = price {
-            attributedText.append(NSAttributedString(string: " for \(formatMoney(_price, currency: currency))", attributes: [
-                .font: UIFont.systemFont(ofSize: 16, weight: .regular),
-            ]))
+        let localizedTitle = seelServerText(title) ?? ""
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: SeelFont.scaled(21, weight: .semibold),
+            .foregroundColor: seelTheme.primaryText,
+        ]
+        guard let price = price else {
+            titleLabel.attributedText = NSAttributedString(string: localizedTitle, attributes: titleAttributes)
+            return
         }
-        titleLabel.attributedText = attributedText
+        let priceAttributes: [NSAttributedString.Key: Any] = [
+            .font: SeelFont.scaled(16, weight: .regular),
+            .foregroundColor: seelTheme.primaryText,
+        ]
+        titleLabel.attributedText = seelComposedText(
+            .wfpTitle,
+            segments: [
+                "title": (localizedTitle, titleAttributes),
+                "price": (formatMoney(price, currency: currency), priceAttributes),
+            ],
+            defaultAttributes: priceAttributes
+        )
     }
     
 }

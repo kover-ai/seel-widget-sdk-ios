@@ -23,15 +23,17 @@ final class EBTHPDPBanner: PDPBannerLayoutProvider {
         container.addSubview(iconView)
 
         let textLabel = UILabel()
-        textLabel.text = "Worry-Free Purchase® available with"
-        textLabel.font = .systemFont(ofSize: 16, weight: .regular)
+        textLabel.text = seelText(.wfpAvailableWith)
+        // 大字号下单行放不下，允许换行而不是截断。
+        textLabel.numberOfLines = 0
+        textLabel.font = SeelFont.scaled(16, weight: .regular)
         textLabel.textColor = seelTheme.tertiaryText
         textLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         container.addSubview(textLabel)
 
         let seelLabel = UILabel()
         seelLabel.text = "seel"
-        seelLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        seelLabel.font = SeelFont.scaled(16, weight: .semibold)
         seelLabel.textColor = seelTheme.accent
         seelLabel.setContentHuggingPriority(.required, for: .horizontal)
         seelLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -48,6 +50,9 @@ final class EBTHPDPBanner: PDPBannerLayoutProvider {
         textLabel.snp.makeConstraints { make in
             make.left.equalTo(iconView.snp.right).offset(4)
             make.centerY.equalToSuperview()
+            // 让换行后的文字把 banner 撑高，而不是被裁掉。
+            make.top.greaterThanOrEqualToSuperview().offset(padding.top)
+            make.bottom.lessThanOrEqualToSuperview().offset(-padding.bottom)
         }
 
         seelLabel.snp.makeConstraints { make in

@@ -116,6 +116,7 @@ class NetworkManager {
         timeoutInterval: TimeInterval? = nil,
         endpoint: String,
         queryParams: T? = nil,
+        headers: [String: String]? = nil,
         responseType: R.Type,
         completion: @escaping @Sendable (Result<R, NetworkError>) -> Void
     ) {
@@ -137,6 +138,7 @@ class NetworkManager {
             request.get(
                 url: buildURL(endpoint: endpoint, base: baseURL),
                 parameters: parameters,
+                headers: headers,
                 responseType: responseType,
                 completion: completion
             )
@@ -161,6 +163,31 @@ extension NetworkManager {
         }
     }
     
+    /// GET /v1/shopify/merchant-configs
+    /// 目前只用于取回商户的多语言配置（`merchants[0].i18n_config`）。
+    public func fetchMerchantConfigs(
+        adminDomain: String,
+        sessionID: String,
+        lang: String,
+        completion: @escaping @Sendable (Result<MerchantConfigsResponse, NetworkError>) -> Void
+    ) {
+        get(
+            timeoutInterval: 5.0,
+            endpoint: "/v1/shopify/merchant-configs",
+            queryParams: MerchantConfigsRequest(
+                adminDomain: adminDomain,
+                sessionID: sessionID,
+                lang: lang
+            ),
+            headers: ["X-Seel-Api-Version": Constants.merchantConfigsAPIVersion],
+            responseType: MerchantConfigsResponse.self
+        ) { result in
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+    }
+
     public func createEvents(_ event: EventsRequest, completion: @escaping @Sendable (Result<EventsResponse, NetworkError>) -> Void) {
         post(
             baseURL: logBaseURL,

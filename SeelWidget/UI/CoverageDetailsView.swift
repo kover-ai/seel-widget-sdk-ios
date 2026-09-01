@@ -33,10 +33,10 @@ final class CoverageDetailsView: UIView {
         backgroundColor = seelTheme.invertedBackground
         layer.cornerRadius = 4
         
-        titleLine.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        titleLine.font = SeelFont.scaled(12, weight: .bold)
         titleLine.textColor = seelTheme.invertedText
         titleLine.numberOfLines = 0
-        titleLine.text = "Get a Full Refund, No Questions Asked"
+        titleLine.text = seelText(.getFullRefund)
         
         stackView.snp.makeConstraints { make in
             make.edges.equalTo(UIEdgeInsets(top: 23, left: 23, bottom: 23, right: 23))
@@ -59,7 +59,7 @@ final class CoverageDetailsView: UIView {
                 view.isHidden = false
                 if let lineView = view as? CoverageLineView {
                     lineView.iconImage = UIImage(swName: "icon_bg_select")
-                    lineView.content = msgs[index - 1]
+                    lineView.content = seelServerText(msgs[index - 1])
                     lineView.contentColor = seelTheme.invertedText
                     lineView.updateViews()
                 }

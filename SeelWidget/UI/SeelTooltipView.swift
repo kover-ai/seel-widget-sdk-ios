@@ -8,7 +8,8 @@ final class SeelTooltipView: UIView {
     private lazy var contentLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.font = SeelFont.scaled(12, weight: .regular)
+        label.enableSeelDynamicType()
         label.textColor = seelTheme.primaryText
         return label
     }()
@@ -28,6 +29,8 @@ final class SeelTooltipView: UIView {
         let btn = UIButton(type: .custom)
         btn.backgroundColor = .clear
         btn.addTarget(self, action: #selector(dismissTooltip), for: .touchUpInside)
+        btn.accessibilityLabel = seelText(.a11yCloseLabel)
+        btn.accessibilityTraits = .button
         return btn
     }()
 
@@ -42,9 +45,12 @@ final class SeelTooltipView: UIView {
 
     private func setupUI() {
         applySeelUserInterfaceStyle()
+        // 浮层盖在整页之上：隔离读屏焦点，并让正文先被读到、关闭动作排在后面。
+        accessibilityViewIsModal = true
         addSubview(dismissOverlay)
         addSubview(cardView)
         cardView.addSubview(contentLabel)
+        accessibilityElements = [contentLabel, dismissOverlay]
 
         dismissOverlay.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -56,6 +62,10 @@ final class SeelTooltipView: UIView {
     }
 
     @objc private func dismissTooltip() {
+        guard !SeelA11y.isReduceMotionEnabled else {
+            removeFromSuperview()
+            return
+        }
         UIView.animate(withDuration: 0.2, animations: {
             self.alpha = 0
         }, completion: { _ in
@@ -89,10 +99,18 @@ final class SeelTooltipView: UIView {
 
         tooltip.layoutIfNeeded()
 
-        UIView.animate(withDuration: 0.2) {
+        if SeelA11y.isReduceMotionEnabled {
             tooltip.alpha = 1
+        } else {
+            UIView.animate(withDuration: 0.2) {
+                tooltip.alpha = 1
+            }
         }
 
+        SeelA11y.announceScreenChange(focusing: tooltip.contentLabel)
+
+        // 8 秒对读屏用户读不完这段说明，开了 VoiceOver 就交给用户自己关。
+        guard !SeelA11y.isVoiceOverRunning else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak tooltip] in
             tooltip?.dismissTooltip()
         }
@@ -100,19 +118,21 @@ final class SeelTooltipView: UIView {
 
     private static func buildTooltipText(from quoteResponse: QuotesResponse?) -> NSAttributedString {
         let reasons = [
-            "Shipping destination not supported",
-            "Checkout currency not accepted",
-            "Order value exceeds our coverage limit",
-            "Item(s) not eligible for this service",
-            "Our system has flagged this order as ineligible"
+            seelText(.ineligibleReasonShipping),
+            seelText(.ineligibleReasonCurrency),
+            seelText(.ineligibleReasonValue),
+            seelText(.ineligibleReasonItems),
+            seelText(.ineligibleReasonSystem),
         ]
 
         let textColor = seelTheme.primaryText
-        let font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        let font = SeelFont.scaled(12, weight: .regular)
 
-        let intro = "We're unable to offer Worry-Free Purchase\u{00AE} Protection for this order. This could be due to one or more of the following reasons:\n\n"
+        // 标点不进 key：后端文案库里的原文不带结尾的 : 和 .，
+        // 把它们拼在这里才能命中译文。
+        let intro = seelText(.ineligibleMainMessage) + ":\n\n"
         let bulletList = reasons.map { "  \u{2022}  \($0)" }.joined(separator: "\n")
-        let footer = "\n\nIf you have any questions, please contact our customer support team for assistance."
+        let footer = "\n\n" + seelText(.ineligibleSupportMessage) + "."
 
         let full = intro + bulletList + footer
 

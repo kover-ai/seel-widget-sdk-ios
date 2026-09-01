@@ -202,6 +202,75 @@ if SeelWidgetSDK.shared.isConfigured {
 }
 ```
 
+### Localization
+
+All SDK copy can be translated. Translations are supplied by the backend keyed by the **English source string** — the same convention the Shopify storefront scripts and the React Native SDK use, so one set of backend copy serves all platforms.
+
+> Full guide: [I18N.md](I18N.md) · [中文版](I18N.zh-CN.md) — the complete string inventory, language normalization table, placeholder rules and troubleshooting.
+
+#### Sources
+
+The SDK merges two sources, the quote-level one winning:
+
+| Source | When | Scope |
+|---|---|---|
+| `GET /v1/shopify/merchant-configs` → `merchants[0].i18n_config` | At `configure` time, when an `adminDomain` is supplied | All SDK copy |
+| `POST /v1/ecommerce/quotes` → `extra_info.i18n` | With every quote | Overrides for that quote |
+
+Both carry the same shape: `{ "lang": "...", "texts": [{ "key": "<English source>", "value": "<translation>" }] }`.
+
+Whatever isn't translated falls back to the SDK's built-in English, so a failed request never leaves the UI blank.
+
+#### Setup
+
+```swift
+SeelWidgetSDK.shared.configure(
+    apiKey: "your_api_key",
+    environment: .production,
+    adminDomain: "your-store.myshopify.com"   // enables merchant-configs translations
+)
+```
+
+Without an `adminDomain` the SDK still works — it just relies on the built-in English plus whatever the quote response carries.
+
+#### Language
+
+```swift
+// Follow the device language (default)
+SeelWidgetSDK.shared.language = nil
+
+// Or pin one
+SeelWidgetSDK.shared.language = "fr-FR"
+
+// What is actually in effect, e.g. "en-US"
+print(SeelWidgetSDK.shared.resolvedLanguage)
+```
+
+The device language is normalized to the tags the backend expects (`zh-Hans-CN` → `zh-CN`, `fr-CA` → `fr-FR`, unknown → `en-US`), matching the storefront scripts' `LANG_LIST`. Changing `language` re-fetches the merchant config and re-renders on-screen views.
+
+#### Notes
+
+- Translations are cached per language in `UserDefaults`, so a cold start renders the last known copy instead of flashing English.
+- Copy the backend sends with the quote (`widget_title`, `display_widget_text`, `coverage_details_text`, `widget_disclaimer`) is looked up in the same table, so it gets translated too.
+- Strings with `{{placeholders}}` (`{{title}} for {{price}}`, `Only {{price}} for Complete Peace of Mind`, `Powered by {{seel}}`) are interpolated client-side. Word order comes from the template — a French translation such as `Pour {{price}}, ajoutez {{title}}` renders with the price first, and each segment keeps its own weight and size.
+- To supply copy yourself (offline, tests, or your own pipeline): `SeelI18nManager.shared.setTexts(["Privacy Policy": "隐私政策"])`.
+
+### Accessibility
+
+Every SDK surface ships with VoiceOver semantics, Dynamic Type, and support for the system's motion and contrast settings. Nothing to configure — it follows the user's device settings.
+
+| Area | What the SDK does |
+|---|---|
+| **VoiceOver** | The toggle is a real accessibility element (label = what is being covered, value = on/off, hint = how to change it) and can be activated by VoiceOver. Icon-only buttons carry spoken names. Decorative artwork (logos, header photo, skeleton loader) is skipped. Titles are never read twice. |
+| **Modality** | The info modal and the rejection tooltip set `accessibilityViewIsModal`, so VoiceOver stays inside them, and move focus on appear. |
+| **Dynamic Type** | All text scales with the user's text-size setting, capped at 2× so an oversized widget can't break the host's cart layout. Containers that hold text grow instead of clipping. |
+| **Reduce Motion** | The loading shimmer, the switch animation and the tooltip fade are skipped when the setting is on. |
+| **Increase Contrast** | Low-contrast greys collapse toward the primary text color and separators switch to the stronger border color. Custom themes are respected; only the weak-contrast tokens change. |
+| **Touch targets** | Small icon buttons keep their visual size but extend their hit area — and their VoiceOver frame — to the 44pt minimum. |
+| **Rejected state** | The whole widget becomes one activatable element with a hint, so screen-reader users can discover the "why is this unavailable" explanation. |
+
+All accessibility strings go through the same localization table as visible copy — see [I18N.md](I18N.md#string-inventory) for the list.
+
 ### Appearance & Theming
 
 Every SDK surface — the WFP widget, the PDP banner, the info modal, the tooltip and the in-app web view — supports light mode, dark mode, and following the system.
@@ -363,7 +432,7 @@ SeelWidgetSDK.shared.createEvents(eventRequest) { result in
 
 ```swift
 // Configure SDK
-func configure(apiKey: String, environment: SeelEnvironment = .production)
+func configure(apiKey: String, environment: SeelEnvironment = .production, adminDomain: String? = nil)
 
 // Send events
 func createEvents(_ event: EventsRequest, completion: @escaping (Result<EventsResponse, NetworkError>) -> Void)
@@ -373,6 +442,9 @@ func setTheme(_ theme: SeelTheme?, for mode: SeelThemeMode = .auto)
 
 // Drop every custom theme
 func resetTheme()
+
+// Fetch merchant-configs and apply its i18n_config translations
+func loadMerchantConfigs(adminDomain: String? = nil, completion: ((Result<MerchantConfigsResponse, NetworkError>) -> Void)? = nil)
 ```
 
 #### Properties
@@ -392,6 +464,15 @@ var isConfigured: Bool
 
 // Appearance mode: .light / .dark / .auto (default)
 var themeMode: SeelThemeMode
+
+// Language override; nil (default) follows the device
+var language: String?
+
+// The language actually in effect, e.g. "en-US"
+var resolvedLanguage: String
+
+// The merchant's myshopify domain, if configured
+var adminDomain: String?
 ```
 
 ### SeelWFPView

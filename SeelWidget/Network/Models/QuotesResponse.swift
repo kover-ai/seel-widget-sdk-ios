@@ -204,6 +204,9 @@ public struct QuotesResponse: Codable, Sendable {
         public let widgetDisclaimer: String?
         public let widgetTitle: String?
         public let optedOut: Bool?
+        /// 随报价一起下发的多语言文案，结构与 merchant-configs 的 `i18n_config` 一致。
+        /// RN SDK 用的就是这一路（见 `react-native-seel-widget` 的 `extra_info.i18n`）。
+        public let i18n: MerchantConfigsResponse.I18nConfig?
 
         enum CodingKeys: String, CodingKey {
             case shippingFee = "shipping_fee"
@@ -215,6 +218,7 @@ public struct QuotesResponse: Codable, Sendable {
             case widgetDisclaimer = "widget_disclaimer"
             case widgetTitle = "widget_title"
             case optedOut = "opted_out"
+            case i18n
         }
     }
     
