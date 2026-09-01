@@ -46,7 +46,7 @@ Seel Widget SDK for iOS allows merchants to integrate Seel's protection services
   # pod install 的清理阶段只保留 readme* / licen[cs]e* / source_files / resources /
   # preserve_paths（见 cocoapods/sandbox/file_accessor.rb 的 all_files）。
   # 隐私说明文档不匹配前两者，不在此列出会被从 Pods/ 目录删除，接入方就看不到了。
-  s.preserve_paths = 'PRIVACY.md', 'PRIVACY.zh-CN.md'
+  s.preserve_paths = 'PRIVACY.md', 'PRIVACY.zh-CN.md', 'THEMING.md', 'THEMING.zh-CN.md'
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'

@@ -202,6 +202,85 @@ if SeelWidgetSDK.shared.isConfigured {
 }
 ```
 
+### Appearance & Theming
+
+Every SDK surface — the WFP widget, the PDP banner, the info modal, the tooltip and the in-app web view — supports light mode, dark mode, and following the system.
+
+> Full guide: [THEMING.md](THEMING.md) · [中文版](THEMING.zh-CN.md) — per-field reference, precedence rules, recipes and troubleshooting.
+
+#### Appearance Mode
+
+```swift
+// Follow the system (default)
+SeelWidgetSDK.shared.themeMode = .auto
+
+// Force one appearance regardless of the system setting
+SeelWidgetSDK.shared.themeMode = .light
+SeelWidgetSDK.shared.themeMode = .dark
+```
+
+| Mode | Behavior |
+|---|---|
+| `.auto` | Follows the system appearance and updates live when the user switches it. **Default.** |
+| `.light` | Always light, even if the host app or the system is dark. |
+| `.dark` | Always dark, even if the host app or the system is light. |
+
+Notes:
+
+- The mode can be changed at any time; views already on screen re-render themselves.
+- On iOS 12 there is no system dark mode, so `.auto` renders as light. `.dark` still works.
+- In `.light` / `.dark` the SDK also sets `overrideUserInterfaceStyle` on its own views, so system controls inside them (blur, scroll indicators, activity indicators) match as well. The host app's own views are never touched.
+
+#### Custom Theme
+
+`SeelTheme` overrides the built-in palette. Every field is optional — unset fields keep the SDK's own colors, so you only specify what your brand needs.
+
+```swift
+// One palette for both appearances
+SeelWidgetSDK.shared.setTheme(SeelTheme(
+    primaryColor: UIColor(red: 0.85, green: 0.33, blue: 0.16, alpha: 1),
+    cornerRadius: 12
+))
+
+// Or a different palette per appearance
+SeelWidgetSDK.shared.setTheme(lightTheme, for: .light)
+SeelWidgetSDK.shared.setTheme(darkTheme, for: .dark)
+
+// Back to the built-in colors
+SeelWidgetSDK.shared.resetTheme()
+```
+
+#### SeelTheme Properties
+
+| Property | Type | Applies to |
+|---|---|---|
+| `primaryColor` | `UIColor?` | Brand color: switch "on" track, accented text |
+| `onPrimaryColor` | `UIColor?` | Content drawn on top of `primaryColor` |
+| `accentColor` | `UIColor?` | Secondary brand color (the "seel" wordmark in the PDP banner) |
+| `backgroundColor` | `UIColor?` | Widget / page background |
+| `selectedBackgroundColor` | `UIColor?` | Background in the selected (opted-in) state |
+| `disabledBackgroundColor` | `UIColor?` | Background in the rejected state |
+| `cardBackgroundColor` | `UIColor?` | Cards inside the info modal |
+| `elevatedBackgroundColor` | `UIColor?` | Modal sheet, tooltip card, navigation bar |
+| `primaryTextColor` | `UIColor?` | Titles |
+| `secondaryTextColor` | `UIColor?` | Supporting text |
+| `tertiaryTextColor` | `UIColor?` | Subtitles and captions |
+| `disclaimerTextColor` | `UIColor?` | Disclaimer text |
+| `linkTextColor` | `UIColor?` | Privacy Policy / Terms of Service links |
+| `ctaBackgroundColor` | `UIColor?` | Primary button background |
+| `ctaTextColor` | `UIColor?` | Primary button title |
+| `borderColor` | `UIColor?` | Borders and dividers |
+| `separatorColor` | `UIColor?` | Hairline separators |
+| `iconTintColor` | `UIColor?` | Monochrome icons in dark mode |
+| `borderWidth` | `CGFloat?` | Widget border width (default `0`) |
+| `cornerRadius` | `CGFloat?` | Widget corner radius (default `0`) |
+
+Precedence: a value set directly on the view (e.g. `wfpView.cornerRadius`, `wfpView.disabledBackgroundColor`, `PDPBannerStyle.backgroundColor`) wins over the theme, and the theme wins over the SDK defaults.
+
+Two convenience fallbacks keep partial themes coherent: overriding `backgroundColor` also moves `selectedBackgroundColor` and `elevatedBackgroundColor` unless you set those explicitly, and overriding `ctaBackgroundColor` covers both CTA styles.
+
+Brand imagery (the Seel logo, the header photo, the two-tone checked checkboxes) is intentionally left as-is in dark mode; only monochrome icons are re-tinted.
+
 ### SeelWFPView Component
 
 #### Callback and Behavior
@@ -239,7 +318,7 @@ Use `PDPBannerStyle` to customize appearance:
 
 ```swift
 pdpBanner.setup(type: "ebth-wfp", style: PDPBannerStyle(
-    backgroundColor: .white,
+    backgroundColor: .white, // omit to follow the SDK theme
     padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12),
     cornerRadius: 6,
     borderColor: UIColor(hex: "#E0E0E0"),
@@ -251,7 +330,7 @@ pdpBanner.setup(type: "ebth-wfp", style: PDPBannerStyle(
 
 | Property | Type | Default | Description |
 |---|---|---|---|
-| `backgroundColor` | `UIColor` | `.white` | Background color |
+| `backgroundColor` | `UIColor?` | `nil` (follows the theme) | Background color |
 | `padding` | `UIEdgeInsets` | `.zero` | Inner padding |
 | `cornerRadius` | `CGFloat` | `0` | Corner radius |
 | `borderColor` | `UIColor?` | `nil` | Border color |
@@ -288,6 +367,12 @@ func configure(apiKey: String, environment: SeelEnvironment = .production)
 
 // Send events
 func createEvents(_ event: EventsRequest, completion: @escaping (Result<EventsResponse, NetworkError>) -> Void)
+
+// Inject a custom theme (.auto applies it to both light and dark)
+func setTheme(_ theme: SeelTheme?, for mode: SeelThemeMode = .auto)
+
+// Drop every custom theme
+func resetTheme()
 ```
 
 #### Properties
@@ -304,6 +389,9 @@ var environment: SeelEnvironment
 
 // Whether configured
 var isConfigured: Bool
+
+// Appearance mode: .light / .dark / .auto (default)
+var themeMode: SeelThemeMode
 ```
 
 ### SeelWFPView
@@ -329,11 +417,11 @@ var optedIn: WFPOptedIn?
 
 | Property | Type | Default | Description |
 |---|---|---|---|
-| `backgroundColor` | `UIColor` | `.white` | The view's background color (inherited from UIView) |
+| `backgroundColor` | `UIColor` | Theme background | The view's background color (inherited from UIView) |
 | `normalBackgroundColor` | `UIColor` | Falls back to `backgroundColor` | Background color for normal (unchecked) state |
 | `selectedBackgroundColor` | `UIColor` | Falls back to `backgroundColor` | Background color for selected (checked) state |
-| `disabledBackgroundColor` | `UIColor` | `#F0EFEF` | Background color for disabled (rejected) state |
-| `cornerRadius` | `CGFloat` | `0` | Corner radius for the widget |
+| `disabledBackgroundColor` | `UIColor` | Theme disabled background | Background color for disabled (rejected) state |
+| `cornerRadius` | `CGFloat` | Theme corner radius (`0` by default) | Corner radius for the widget |
 | `showDisclaimer` | `Bool` | Per brand default | Whether to show the disclaimer text. Defaults to `false` for EBTH, `true` for others |
 
 ```swift
