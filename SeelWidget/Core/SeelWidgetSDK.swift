@@ -44,6 +44,28 @@ public class SeelWidgetSDK {
         return !key.isEmpty
     }
     
+    // MARK: - Theme
+
+    /// Appearance mode: `.light`, `.dark`, or `.auto` (follow the system, default).
+    /// On iOS 12 `.auto` falls back to light, since the system has no dark mode.
+    public var themeMode: SeelThemeMode {
+        get { SeelThemeManager.shared.mode }
+        set { SeelThemeManager.shared.mode = newValue }
+    }
+
+    /// Inject a custom theme. Fields left nil keep the SDK's built-in colors.
+    /// - Parameters:
+    ///   - theme: The custom palette, or nil to drop the override for that appearance.
+    ///   - mode: `.light` / `.dark` target one appearance; `.auto` (default) applies to both.
+    public func setTheme(_ theme: SeelTheme?, for mode: SeelThemeMode = .auto) {
+        SeelThemeManager.shared.setTheme(theme, for: mode)
+    }
+
+    /// Drop every custom theme and go back to the built-in colors.
+    public func resetTheme() {
+        SeelThemeManager.shared.resetTheme()
+    }
+
     public func createEvents(_ event: EventsRequest, completion: @escaping @Sendable (Result<EventsResponse, NetworkError>) -> Void) {
         var _event = event
         _event.eventID = UUID().uuidString
