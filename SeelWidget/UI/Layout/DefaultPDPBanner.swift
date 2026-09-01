@@ -5,34 +5,34 @@ import SnapKit
 /// Displays a single-line banner: [shopping_bag icon] "Worry-Free Purchase® available with" [seel]
 final class DefaultPDPBanner: PDPBannerLayoutProvider {
 
-    private let bgColor: UIColor
+    private let bgColor: UIColor?
     private let padding: UIEdgeInsets
 
-    init(backgroundColor: UIColor = .white, padding: UIEdgeInsets = .zero) {
+    init(backgroundColor: UIColor? = nil, padding: UIEdgeInsets = .zero) {
         self.bgColor = backgroundColor
         self.padding = padding
     }
 
     func buildLayout(in container: UIView) {
         container.isHidden = false
-        container.backgroundColor = bgColor
+        container.backgroundColor = bgColor ?? seelTheme.background
 
         let iconView = UIImageView()
-        iconView.image = UIImage(swName: "shopping_bag")
+        iconView.image = seelThemedIcon("shopping_bag", darkTint: \.iconMutedTint)
         iconView.contentMode = .scaleAspectFit
         container.addSubview(iconView)
 
         let textLabel = UILabel()
         textLabel.text = "Worry-Free Purchase® available with"
         textLabel.font = .systemFont(ofSize: 16, weight: .regular)
-        textLabel.textColor = UIColor(hex: "#676667")
+        textLabel.textColor = seelTheme.tertiaryText
         textLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         container.addSubview(textLabel)
 
         let seelLabel = UILabel()
         seelLabel.text = "seel"
         seelLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        seelLabel.textColor = UIColor(hex: "#635BFF")
+        seelLabel.textColor = seelTheme.accent
         seelLabel.setContentHuggingPriority(.required, for: .horizontal)
         seelLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         container.addSubview(seelLabel)

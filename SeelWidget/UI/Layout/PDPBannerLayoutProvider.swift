@@ -10,7 +10,7 @@ protocol PDPBannerLayoutProvider {
 enum PDPBannerLayoutFactory {
     static func provider(
         for brandType: String?,
-        backgroundColor: UIColor = .white,
+        backgroundColor: UIColor? = nil,
         padding: UIEdgeInsets = .zero
     ) -> PDPBannerLayoutProvider {
         switch brandType {

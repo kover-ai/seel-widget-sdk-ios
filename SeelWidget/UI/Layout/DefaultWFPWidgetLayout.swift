@@ -30,7 +30,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
     private lazy var disclaimerLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 11, weight: .regular)
-        label.textColor = UIColor(hex: "#808692")
+        label.textColor = seelTheme.disclaimerText
         label.numberOfLines = 0
         label.isHidden = true
         return label
@@ -45,7 +45,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
 
     private lazy var switcher: SeelSwitch = {
         let switcher = SeelSwitch()
-        switcher.onTintColor = UIColor(hex: "#2121C4")
+        switcher.onTintColor = seelTheme.primary
         switcher.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
         switcher.isOn = true
         return switcher
@@ -152,7 +152,7 @@ final class DefaultWFPWidgetLayout: WFPWidgetLayoutProvider {
             if index < msgs.count {
                 view.isHidden = false
                 if let lineView = view as? LineView {
-                    lineView.iconImage = msgs.count > 1 ? UIImage(swName: "icon_select") : nil
+                    lineView.iconImage = msgs.count > 1 ? seelThemedIcon("icon_select", darkTint: \.iconMutedTint) : nil
                     lineView.content = msgs[index]
                     lineView.updateViews()
                 }

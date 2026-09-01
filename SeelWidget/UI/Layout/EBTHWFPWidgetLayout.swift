@@ -14,9 +14,9 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
     private lazy var checkboxButton: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setImage(UIImage(swName: "ebth_checkbox_normal"), for: .normal)
+        btn.setImage(seelThemedIcon("ebth_checkbox_normal", darkTint: \.iconMutedTint), for: .normal)
         btn.setImage(UIImage(swName: "ebth_checkbox_selected"), for: .selected)
-        btn.setImage(UIImage(swName: "ebth_checkbox_disabled"), for: .disabled)
+        btn.setImage(seelThemedIcon("ebth_checkbox_disabled", darkTint: \.iconMutedTint), for: .disabled)
         btn.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
         btn.isAccessibilityElement = true
         btn.accessibilityTraits = .button
@@ -33,7 +33,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
 
     private lazy var infoButton: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setImage(UIImage(swName: "ebth_info"), for: .normal)
+        btn.setImage(seelThemedIcon("ebth_info", darkTint: \.iconMutedTint), for: .normal)
         return btn
     }()
 
@@ -41,7 +41,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
         let label = UILabel()
         label.text = "for"
         label.font = .systemFont(ofSize: 15, weight: .regular)
-        label.textColor = UIColor(hex: "#292728")
+        label.textColor = seelTheme.primaryText
         label.isHidden = true
         return label
     }()
@@ -75,7 +75,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
     private lazy var disclaimerLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(hex: "#676667")
+        label.textColor = seelTheme.tertiaryText
         label.numberOfLines = 0
         label.isHidden = true
         return label
@@ -216,7 +216,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
         container.alpha = 1.0
 
         // Title: "Worry-Free Purchase® for $3.75"
-        let titleColor = isRejected ? UIColor(hex: "#676667") : UIColor(hex: "#292728")
+        let titleColor = isRejected ? seelTheme.tertiaryText : seelTheme.primaryText
         if isRejected {
             titleLabel.text = quoteResponse?.extraInfo?.widgetTitle
             titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
@@ -273,7 +273,7 @@ final class EBTHWFPWidgetLayout: WFPWidgetLayoutProvider {
                 string: msgs.joined(separator: "\n"),
                 attributes: [
                     .font: UIFont.systemFont(ofSize: 12, weight: .regular),
-                    .foregroundColor: UIColor(hex: "#676667"),
+                    .foregroundColor: seelTheme.tertiaryText,
                     .paragraphStyle: paragraphStyle
                 ]
             )

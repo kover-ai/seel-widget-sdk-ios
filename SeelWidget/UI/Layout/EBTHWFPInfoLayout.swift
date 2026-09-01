@@ -20,7 +20,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Dim overlay (tap to close)
         let dimOverlay = UIView()
-        dimOverlay.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        dimOverlay.backgroundColor = seelTheme.scrim
         view.addSubview(dimOverlay)
         
         let overlayTap = UITapGestureRecognizer()
@@ -35,7 +35,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Bottom sheet container
         let sheetContainer = UIView()
-        sheetContainer.backgroundColor = .white
+        sheetContainer.backgroundColor = seelTheme.elevatedBackground
         sheetContainer.layer.cornerRadius = 16
         sheetContainer.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         sheetContainer.clipsToBounds = true
@@ -152,7 +152,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             whiteCard = blurView.contentView
         } else {
             let plainView = UIView()
-            plainView.backgroundColor = .white
+            plainView.backgroundColor = seelTheme.elevatedBackground
             plainView.layer.cornerRadius = 10
             plainView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
             plainView.clipsToBounds = true
@@ -171,7 +171,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let wfpTitleLabel = UILabel()
         wfpTitleLabel.text = quoteResponse?.extraInfo?.widgetTitle ?? ""
         wfpTitleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        wfpTitleLabel.textColor = UIColor(hex: "#1E2022")
+        wfpTitleLabel.textColor = seelTheme.primaryText
         wfpTitleLabel.textAlignment = .center
         whiteCard.addSubview(wfpTitleLabel)
         
@@ -182,7 +182,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         // MARK: - Coverage Card
         let coverageCard = UIView()
-        coverageCard.backgroundColor = UIColor(hex: "#F8F9FF")
+        coverageCard.backgroundColor = seelTheme.cardBackground
         coverageCard.layer.cornerRadius = 10
         whiteCard.addSubview(coverageCard)
         
@@ -198,15 +198,15 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         coverageCard.addSubview(coverageHeaderSV)
         
         let shieldIcon = UIImageView()
-        shieldIcon.image = UIImage(swName: "accredited")
-        shieldIcon.tintColor = UIColor(hex: "#1E2022")
+        shieldIcon.image = seelThemedIcon("accredited")
+        shieldIcon.tintColor = seelTheme.iconTint
         shieldIcon.contentMode = .scaleAspectFit
         coverageHeaderSV.addArrangedSubview(shieldIcon)
         
         let coverageHeaderLabel = UILabel()
         coverageHeaderLabel.text = "What's Covered"
         coverageHeaderLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        coverageHeaderLabel.textColor = UIColor(hex: "#000000")
+        coverageHeaderLabel.textColor = seelTheme.primaryText
         coverageHeaderSV.addArrangedSubview(coverageHeaderLabel)
         
         shieldIcon.setContentHuggingPriority(.required, for: .vertical)
@@ -279,16 +279,16 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         let optInButton = UIButton(type: .custom)
         optInButton.setTitle("Secure Your Purchase Now", for: .normal)
-        optInButton.setTitleColor(.white, for: .normal)
+        optInButton.setTitleColor(seelTheme.onCTAText, for: .normal)
         optInButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-        optInButton.backgroundColor = UIColor(hex: "#000000")
+        optInButton.backgroundColor = seelTheme.emphasisCTABackground
         optInButton.layer.cornerRadius = 10
         optInButton.addTapHandler { actions.onOptIn() }
         footerContainer.addSubview(optInButton)
         
         let noNeedButton = UIButton(type: .custom)
         noNeedButton.setTitle("Continue Without Protection", for: .normal)
-        noNeedButton.setTitleColor(UIColor(hex: "#808692"), for: .normal)
+        noNeedButton.setTitleColor(seelTheme.disclaimerText, for: .normal)
         noNeedButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
         noNeedButton.addTapHandler { actions.onNoNeed() }
         footerContainer.addSubview(noNeedButton)
@@ -315,11 +315,11 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         let poweredByLabel = UILabel()
         poweredByLabel.text = "Powered By"
         poweredByLabel.font = .systemFont(ofSize: 10, weight: .regular)
-        poweredByLabel.textColor = UIColor(hex: "#000000")
+        poweredByLabel.textColor = seelTheme.primaryText
         let seelTextLabel = UILabel()
         seelTextLabel.text = "Seel"
         seelTextLabel.font = .systemFont(ofSize: 10, weight: .bold)
-        seelTextLabel.textColor = UIColor(hex: "#000000")
+        seelTextLabel.textColor = seelTheme.primaryText
         poweredBySV.addArrangedSubview(poweredByLabel)
         poweredBySV.addArrangedSubview(seelTextLabel)
         
@@ -336,7 +336,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             make.centerX.equalToSuperview()
         }
         let divider = UIView()
-        divider.backgroundColor = UIColor(hex: "#E0E0E0")
+        divider.backgroundColor = seelTheme.border
         footerContainer.addSubview(divider)
         divider.snp.makeConstraints { make in
             make.top.equalTo(noNeedButton.snp.bottom).offset(20)
@@ -361,7 +361,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
         
         let checkIcon = UIImageView()
         checkIcon.image = UIImage(swName: "icon_check_selected_black")
-        checkIcon.tintColor = UIColor(hex: "#34C759")
+        checkIcon.tintColor = seelTheme.success
         checkIcon.contentMode = .scaleAspectFit
         container.addSubview(checkIcon)
         
@@ -374,14 +374,14 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
                 string: parts[0],
                 attributes: [
                     .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
-                    .foregroundColor: UIColor(hex: "#000000")
+                    .foregroundColor: seelTheme.primaryText
                 ]
             )
             attr.append(NSAttributedString(
                 string: " - " + parts.dropFirst().joined(separator: " - "),
                 attributes: [
                     .font: UIFont.systemFont(ofSize: 14, weight: .medium),
-                    .foregroundColor: UIColor(hex: "#000000")
+                    .foregroundColor: seelTheme.primaryText
                 ]
             ))
             label.attributedText = attr
@@ -392,21 +392,21 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
                     string: dashParts[0],
                     attributes: [
                         .font: UIFont.systemFont(ofSize: 14, weight: .semibold),
-                        .foregroundColor: UIColor(hex: "#000000")
+                        .foregroundColor: seelTheme.primaryText
                     ]
                 )
                 attr.append(NSAttributedString(
                     string: " – " + dashParts.dropFirst().joined(separator: " – "),
                     attributes: [
                         .font: UIFont.systemFont(ofSize: 14, weight: .medium),
-                        .foregroundColor: UIColor(hex: "#000000")
+                        .foregroundColor: seelTheme.primaryText
                     ]
                 ))
                 label.attributedText = attr
             } else {
                 label.text = text
                 label.font = .systemFont(ofSize: 14)
-                label.textColor = UIColor(hex: "#000000")
+                label.textColor = seelTheme.primaryText
             }
         }
         
@@ -431,26 +431,26 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
     
     private func buildFeatureCard(iconName: String, title: String, detail: String) -> UIView {
         let card = UIView()
-        card.backgroundColor = UIColor(hex: "#F8F9FF")
+        card.backgroundColor = seelTheme.cardBackground
         card.layer.cornerRadius = 10
         
         let iconView = UIImageView()
-        iconView.image = UIImage(swName: iconName)
-        iconView.tintColor = UIColor(hex: "#000000")
+        iconView.image = seelThemedIcon(iconName)
+        iconView.tintColor = seelTheme.iconTint
         iconView.contentMode = .scaleAspectFit
         card.addSubview(iconView)
         
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        titleLabel.textColor = UIColor(hex: "#000000")
+        titleLabel.textColor = seelTheme.primaryText
         titleLabel.numberOfLines = 0
         card.addSubview(titleLabel)
         
         let detailLabel = UILabel()
         detailLabel.text = detail
         detailLabel.font = .systemFont(ofSize: 14, weight: .regular)
-        detailLabel.textColor = UIColor(hex: "#000000")
+        detailLabel.textColor = seelTheme.primaryText
         detailLabel.numberOfLines = 0
         card.addSubview(detailLabel)
         
@@ -478,7 +478,7 @@ final class EBTHWFPInfoLayout: WFPInfoLayoutProvider {
             attributes: [
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
                 .font: UIFont.systemFont(ofSize: 11, weight: .regular),
-                .foregroundColor: UIColor(hex: "#5C5F62")
+                .foregroundColor: seelTheme.linkText
             ]
         )
         button.setAttributedTitle(attr, for: .normal)

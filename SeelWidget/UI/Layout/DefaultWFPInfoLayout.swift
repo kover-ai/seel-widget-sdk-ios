@@ -10,7 +10,7 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         actions: WFPInfoLayoutActions
     ) {
         let view = viewController.view!
-        view.backgroundColor = .white
+        view.backgroundColor = seelTheme.background
         
         // MARK: - Navigation Bar
         let navigationBar = SeelNavigationBar()
@@ -18,14 +18,14 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         
         let closeButton = UIButton(type: .custom)
         closeButton.setTitle("Close", for: .normal)
-        closeButton.setTitleColor(.black, for: .normal)
+        closeButton.setTitleColor(seelTheme.primaryText, for: .normal)
         closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .light)
         closeButton.addTapHandler { actions.onClose() }
         navigationBar.rightBarButtonItems = [closeButton]
         
         // MARK: - Scroll Content
         let backgroundView = UIView()
-        backgroundView.backgroundColor = .white
+        backgroundView.backgroundColor = seelTheme.background
         
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = true
@@ -44,10 +44,10 @@ final class DefaultWFPInfoLayout: WFPInfoLayoutProvider {
         let seelKeyword = "Seel"
         let attributedText = NSMutableAttributedString(string: seelFullText)
         let nsFullText = seelFullText as NSString
-        attributedText.addAttribute(.foregroundColor, value: UIColor(hex: "#000000"), range: NSRange(location: 0, length: nsFullText.length))
+        attributedText.addAttribute(.foregroundColor, value: seelTheme.primaryText, range: NSRange(location: 0, length: nsFullText.length))
         let seelRange = nsFullText.range(of: seelKeyword)
         if seelRange.location != NSNotFound {
-            attributedText.addAttribute(.foregroundColor, value: UIColor(hex: "#2121C4"), range: seelRange)
+            attributedText.addAttribute(.foregroundColor, value: seelTheme.primary, range: seelRange)
         }
         seelLabel.attributedText = attributedText
         seelLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
