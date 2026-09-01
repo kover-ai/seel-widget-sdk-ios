@@ -29,22 +29,22 @@ final class CoverageTipsView: UIView {
     
     func configViews() {
         resolutionTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        resolutionTitleLabel.textColor = UIColor(hex: "#1E2022")
+        resolutionTitleLabel.textColor = seelTheme.primaryText
         resolutionTitleLabel.numberOfLines = 0
         resolutionTitleLabel.text = "Easy Resolution"
         
         resolutionDetailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        resolutionDetailLabel.textColor = UIColor(hex: "#565656")
+        resolutionDetailLabel.textColor = seelTheme.secondaryText
         resolutionDetailLabel.numberOfLines = 0
         resolutionDetailLabel.text = "Resolve your issues with just a few clicks"
         
         peaceTipTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        peaceTipTitleLabel.textColor = UIColor(hex: "#1E2022")
+        peaceTipTitleLabel.textColor = seelTheme.primaryText
         peaceTipTitleLabel.numberOfLines = 0
         peaceTipTitleLabel.text = "Complete Peace of Mind"
         
         peaceTipDetailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        peaceTipDetailLabel.textColor = UIColor(hex: "#565656")
+        peaceTipDetailLabel.textColor = seelTheme.secondaryText
         peaceTipDetailLabel.numberOfLines = 0
         peaceTipDetailLabel.text = """
 • Zero-risk on your order with our protection

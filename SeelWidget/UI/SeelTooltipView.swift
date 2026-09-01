@@ -9,13 +9,13 @@ final class SeelTooltipView: UIView {
         let label = UILabel()
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(hex: "#202223")
+        label.textColor = seelTheme.primaryText
         return label
     }()
 
     private lazy var cardView: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        v.backgroundColor = seelTheme.elevatedBackground
         v.layer.cornerRadius = 8
         v.layer.shadowColor = UIColor.black.cgColor
         v.layer.shadowOpacity = 0.1
@@ -41,6 +41,7 @@ final class SeelTooltipView: UIView {
     }
 
     private func setupUI() {
+        applySeelUserInterfaceStyle()
         addSubview(dismissOverlay)
         addSubview(cardView)
         cardView.addSubview(contentLabel)
@@ -106,7 +107,7 @@ final class SeelTooltipView: UIView {
             "Our system has flagged this order as ineligible"
         ]
 
-        let textColor = UIColor(hex: "#202223")
+        let textColor = seelTheme.primaryText
         let font = UIFont.systemFont(ofSize: 12, weight: .regular)
 
         let intro = "We're unable to offer Worry-Free Purchase\u{00AE} Protection for this order. This could be due to one or more of the following reasons:\n\n"

@@ -9,19 +9,19 @@ final class SeelSwitch: UIView {
         }
     }
     
-    public var onTintColor: UIColor = UIColor(hex: "#2121C4") {
+    public var onTintColor: UIColor = seelTheme.primary {
         didSet {
             updateColors()
         }
     }
     
-    public var thumbTintColor: UIColor = .white {
+    public var thumbTintColor: UIColor = seelTheme.toggleThumb {
         didSet {
             updateColors()
         }
     }
     
-    public var trackTintColor: UIColor = UIColor.lightGray {
+    public var trackTintColor: UIColor = seelTheme.toggleTrack {
         didSet {
             updateColors()
         }

@@ -10,7 +10,7 @@ final class SeelNavigationBar: UIView {
     private lazy var lineView = UIView(frame: .zero)
 
     public var titleTextAttributes: [NSAttributedString.Key: Any] = [
-        .foregroundColor: UIColor(hex: "#333333"),
+        .foregroundColor: seelTheme.primaryText,
         .font: UIFont.systemFont(ofSize: 17, weight: .medium)
     ] {
         didSet { applyTitleTextAttributes() }
@@ -67,12 +67,12 @@ final class SeelNavigationBar: UIView {
     private func createViews() {
         clipsToBounds = true
         
-        backgroundColor = .white
+        backgroundColor = seelTheme.background
 
         addSubview(containerView)
         addSubview(lineView)
         
-        lineView.backgroundColor = UIColor(hex: "#EEEEEE")
+        lineView.backgroundColor = seelTheme.separator
 
         leftStack.axis = .horizontal
         leftStack.alignment = .center
@@ -162,7 +162,7 @@ final class SeelNavigationBar: UIView {
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
         // Add default tint to match title color if not customized
-        button.tintColor = (titleTextAttributes[.foregroundColor] as? UIColor) ?? .black
+        button.tintColor = (titleTextAttributes[.foregroundColor] as? UIColor) ?? seelTheme.primaryText
         if button.titleColor(for: .normal) == nil {
             button.setTitleColor(button.tintColor, for: .normal)
         }

@@ -10,7 +10,7 @@ final class SeelWebViewController: UIViewController {
     // Navigation bar
     private lazy var navigationBar: UIView = {
         let navBar = UIView()
-        navBar.backgroundColor = .white
+        navBar.backgroundColor = seelTheme.background
         navBar.layer.shadowColor = UIColor.black.cgColor
         navBar.layer.shadowOffset = CGSize(width: 0, height: 1)
         navBar.layer.shadowOpacity = 0.1
@@ -23,7 +23,7 @@ final class SeelWebViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("←", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(seelTheme.primaryText, for: .normal)
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -32,7 +32,7 @@ final class SeelWebViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        label.textColor = .black
+        label.textColor = seelTheme.primaryText
         label.textAlignment = .center
         return label
     }()
@@ -42,7 +42,7 @@ final class SeelWebViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("✕", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(seelTheme.primaryText, for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -50,8 +50,8 @@ final class SeelWebViewController: UIViewController {
     // Progress bar
     private lazy var progressView: UIProgressView = {
         let progressView = UIProgressView(progressViewStyle: .default)
-        progressView.progressTintColor = UIColor(hex: "#2121C4")
-        progressView.trackTintColor = UIColor.lightGray
+        progressView.progressTintColor = seelTheme.primary
+        progressView.trackTintColor = seelTheme.separator
         progressView.progress = 0.0
         return progressView
     }()
@@ -103,7 +103,8 @@ final class SeelWebViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        applySeelUserInterfaceStyle()
+        view.backgroundColor = seelTheme.background
         
         // Add navigation bar
         view.addSubview(navigationBar)

@@ -14,7 +14,7 @@ final class SeelCheckbox: UIView {
     
     private lazy var button: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setImage(UIImage(swName: "checkbox_normal"), for: .normal)
+        btn.setImage(seelThemedIcon("checkbox_normal"), for: .normal)
         btn.setImage(UIImage(swName: "checkbox_selected"), for: .selected)
         btn.addTarget(self, action: #selector(tapped), for: .touchUpInside)
         btn.isAccessibilityElement = true

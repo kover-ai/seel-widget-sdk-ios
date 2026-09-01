@@ -14,17 +14,14 @@ class LoadingAnimationView: UIView {
         setupAnimation()
     }
     
+    private var themeObserver: SeelThemeObserver?
+
     private func setupAnimation() {
         // Set view style
         self.layer.cornerRadius = 4
         self.clipsToBounds = true
         
-        // Configure gradient layer
-        gradientLayer.colors = [
-            UIColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.00).cgColor, // #f0f0f0
-            UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1.00).cgColor, // #e0e0e0
-            UIColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.00).cgColor  // #f0f0f0
-        ]
+        updateGradientColors()
         
         gradientLayer.locations = [0.25, 0.5, 0.75]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
@@ -33,6 +30,21 @@ class LoadingAnimationView: UIView {
         updateGradientFrame()
         
         self.layer.addSublayer(gradientLayer)
+        
+        themeObserver = SeelThemeObserver { [weak self] in self?.updateGradientColors() }
+    }
+    
+    /// CAGradientLayer 只吃 CGColor，动态色必须按当前 trait 解析后再写入，
+    /// 并在外观变化时重新写一次。
+    private func updateGradientColors() {
+        let base = seelTheme.skeletonBase.resolvedSeelColor(for: traitCollection).cgColor
+        let highlight = seelTheme.skeletonHighlight.resolvedSeelColor(for: traitCollection).cgColor
+        gradientLayer.colors = [base, highlight, base]
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateGradientColors()
     }
     
     private func updateGradientFrame() {

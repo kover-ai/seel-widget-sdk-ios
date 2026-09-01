@@ -40,7 +40,7 @@ final class CoverageLineView: UIView {
     
     func configViews() {
         contentLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        contentLabel.textColor = UIColor(hex: "#414141")
+        contentLabel.textColor = seelTheme.secondaryText
         contentLabel.numberOfLines = 0
         
         contentSV.snp.makeConstraints { make in
@@ -57,6 +57,6 @@ final class CoverageLineView: UIView {
         
         contentLabel.text = content
         contentLabel.font = contentFont ?? UIFont.systemFont(ofSize: 12, weight: .medium)
-        contentLabel.textColor = contentColor ?? UIColor(hex: "#414141")
+        contentLabel.textColor = contentColor ?? seelTheme.secondaryText
     }
 }

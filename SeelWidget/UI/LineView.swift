@@ -18,7 +18,7 @@ final class LineView: UIView {
         return stackView
     }()
     
-    private lazy var icon = UIImageView(image: UIImage(swName: "icon_select"))
+    private lazy var icon = UIImageView(image: seelThemedIcon("icon_select", darkTint: \.iconMutedTint))
     private lazy var contentLabel = UILabel(frame: .zero)
     
     override public init(frame: CGRect) {
@@ -40,7 +40,7 @@ final class LineView: UIView {
     
     func configViews() {
         contentLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        contentLabel.textColor = UIColor(hex: "#414141")
+        contentLabel.textColor = seelTheme.secondaryText
         contentLabel.numberOfLines = 0
         
         contentSV.snp.makeConstraints { make in
@@ -57,6 +57,6 @@ final class LineView: UIView {
         
         contentLabel.text = content
         contentLabel.font = contentFont ?? UIFont.systemFont(ofSize: 12, weight: .medium)
-        contentLabel.textColor = contentColor ?? UIColor(hex: "#414141")
+        contentLabel.textColor = contentColor ?? seelTheme.secondaryText
     }
 }

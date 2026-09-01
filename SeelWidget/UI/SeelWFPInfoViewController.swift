@@ -13,6 +13,8 @@ final class SeelWFPInfoViewController: UIViewController {
     public var quoteResponse: QuotesResponse?
     
     private let brandType: String?
+
+    private var themeObserver: SeelThemeObserver?
     
     public init(quoteResponse: QuotesResponse?, brandType: String? = nil) {
         self.quoteResponse = quoteResponse
@@ -26,7 +28,20 @@ final class SeelWFPInfoViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        buildLayout()
+        themeObserver = SeelThemeObserver { [weak self] in self?.rebuildLayout() }
+    }
+
+    /// 主题切换后整屏重建：弹窗里的颜色都是在构建时写入子视图的。
+    private func rebuildLayout() {
+        view.subviews.forEach { $0.removeFromSuperview() }
+        buildLayout()
+    }
+
+    private func buildLayout() {
+        applySeelUserInterfaceStyle()
+
         let layoutProvider = WFPInfoLayoutFactory.provider(for: brandType)
         let actions = WFPInfoLayoutActions(
             onClose: { [weak self] in self?.dismiss(animated: true) },
@@ -37,5 +52,5 @@ final class SeelWFPInfoViewController: UIViewController {
         )
         layoutProvider.buildLayout(in: self, quoteResponse: quoteResponse, actions: actions)
     }
-    
+
 }

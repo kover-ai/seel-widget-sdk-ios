@@ -16,9 +16,9 @@ final class CoverageInfoFooter: UIView {
         let button = UIButton(type: .custom)
         button.contentEdgeInsets = .init(top: 0, left: 16, bottom: 0, right: 16)
         button.setTitle("Opt-In Now for Full Protection", for: .normal)
-        button.setTitleColor(UIColor(hex: "#FFFFFF"), for: .normal)
+        button.setTitleColor(seelTheme.onCTAText, for: .normal)
         button.addTarget(self, action: #selector(optedInButtonClicked), for: .touchUpInside)
-        button.backgroundColor = UIColor(hex: "#333333")
+        button.backgroundColor = seelTheme.ctaBackground
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
         return button
     }()
@@ -26,7 +26,7 @@ final class CoverageInfoFooter: UIView {
     private lazy var noNeedButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle("No Need", for: .normal)
-        button.setTitleColor(UIColor(hex: "#4F4F4F"), for: .normal)
+        button.setTitleColor(seelTheme.secondaryText, for: .normal)
         button.addTarget(self, action: #selector(noNeedButtonClicked), for: .touchUpInside)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         return button
@@ -46,7 +46,7 @@ final class CoverageInfoFooter: UIView {
             attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]
         )
         button.setAttributedTitle(attributedString, for: .normal)
-        button.setTitleColor(UIColor(hex: "#5C5F62"), for: .normal)
+        button.setTitleColor(seelTheme.linkText, for: .normal)
         button.addTarget(self, action: #selector(privacyPolicyButtonClicked), for: .touchUpInside)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         return button
@@ -59,7 +59,7 @@ final class CoverageInfoFooter: UIView {
             attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]
         )
         button.setAttributedTitle(attributedString, for: .normal)
-        button.setTitleColor(UIColor(hex: "#5C5F62"), for: .normal)
+        button.setTitleColor(seelTheme.linkText, for: .normal)
         button.addTarget(self, action: #selector(termsButtonClicked), for: .touchUpInside)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         return button
@@ -85,7 +85,7 @@ final class CoverageInfoFooter: UIView {
     
     func configViews() {
         optedInButton.layer.cornerRadius = 38 / 2
-        optedInButton.backgroundColor = UIColor(hex: "#333333")
+        optedInButton.backgroundColor = seelTheme.ctaBackground
         
         optedInButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()

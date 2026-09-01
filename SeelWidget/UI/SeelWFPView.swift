@@ -36,8 +36,14 @@ public final class SeelWFPView: UIView {
         set { _selectedBackgroundColor = newValue }
     }
     
-    public var disabledBackgroundColor: UIColor = UIColor(hex: "#F0EFEF")
-    
+    private var _disabledBackgroundColor: UIColor?
+
+    /// Background color for the disabled (rejected) state. Defaults to the current theme.
+    public var disabledBackgroundColor: UIColor {
+        get { _disabledBackgroundColor ?? seelTheme.disabledBackground }
+        set { _disabledBackgroundColor = newValue }
+    }
+
     private var _showDisclaimer: Bool?
     
     /// Whether to show the widget disclaimer text.
@@ -47,30 +53,82 @@ public final class SeelWFPView: UIView {
         set { _showDisclaimer = newValue }
     }
     
-    /// Corner radius for the widget. Defaults to 0 (no rounding).
-    public var cornerRadius: CGFloat = 0 {
-        didSet {
-            layer.cornerRadius = cornerRadius
-            clipsToBounds = cornerRadius > 0
+    private var _cornerRadius: CGFloat?
+
+    /// Corner radius for the widget. Defaults to the current theme (0 unless customized).
+    public var cornerRadius: CGFloat {
+        get { _cornerRadius ?? seelTheme.cornerRadius }
+        set {
+            _cornerRadius = newValue
+            applyCornerRadius()
         }
     }
-    
+
     private var loading: Bool = false
     private var quoteResponse: QuotesResponse?
     private var toggleIsOn: Bool = true
     private var layoutProvider: WFPWidgetLayoutProvider?
     private var latestRequestToken: Int = 0
-    
+    private var themeObserver: SeelThemeObserver?
+    /// 最近一次由主题写入的背景色，用来判断宿主是否自己改过 backgroundColor。
+    private var themeAppliedBackgroundColor: UIColor?
+
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .white
+        applySeelUserInterfaceStyle()
+        applyThemeBackground()
+        applyCornerRadius()
+        applyThemeBorder()
         buildDefaultLayout()
+        themeObserver = SeelThemeObserver { [weak self] in self?.applyTheme() }
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    /// Re-apply everything the theme drives. Called when the host switches mode
+    /// or injects a new palette; the system light/dark switch is handled by the
+    /// dynamic colors themselves and needs no rebuild.
+    private func applyTheme() {
+        applySeelUserInterfaceStyle()
+        applyThemeBackground()
+        applyCornerRadius()
+        applyThemeBorder()
+        // Layout providers capture colors when they build their subviews,
+        // so a palette swap means rebuilding them.
+        rebuildLayout(brandType: quoteResponse?.type)
+    }
+
+    /// 只在宿主没有自己设置过 backgroundColor 时才跟随主题，
+    /// 否则主题切换会把宿主指定的背景色冲掉。
+    private func applyThemeBackground() {
+        guard backgroundColor == nil || backgroundColor == themeAppliedBackgroundColor else { return }
+        let themeBackground = seelTheme.background
+        backgroundColor = themeBackground
+        themeAppliedBackgroundColor = themeBackground
+    }
+
+    private func applyCornerRadius() {
+        layer.cornerRadius = cornerRadius
+        clipsToBounds = cornerRadius > 0
+    }
+
+    /// Only touches the layer when the theme actually asks for a border,
+    /// so a host-configured border is never wiped out.
+    private func applyThemeBorder() {
+        let width = seelTheme.borderWidth
+        guard width > 0 else { return }
+        layer.borderWidth = width
+        layer.borderColor = seelTheme.border.resolvedSeelColor(for: traitCollection).cgColor
+    }
+
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        // CGColor does not re-resolve on its own when the appearance changes.
+        applyThemeBorder()
+    }
+
     /// Build the initial layout with default provider (before quote response is available).
     private func buildDefaultLayout() {
         rebuildLayout(brandType: nil)

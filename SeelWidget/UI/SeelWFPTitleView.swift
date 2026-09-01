@@ -56,7 +56,7 @@ final class SeelWFPTitleView: UIView {
     
     private lazy var infoButton: UIButton = {
         let infoButton = UIButton(type: .custom)
-        infoButton.setImage(UIImage(swName: "info_black"), for: .normal)
+        infoButton.setImage(seelThemedIcon("info_black", darkTint: \.iconMutedTint), for: .normal)
         infoButton.isEnabled = false
         return infoButton
     }()
@@ -101,15 +101,15 @@ final class SeelWFPTitleView: UIView {
     
     func configViews() {
         titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
-        titleLabel.textColor = UIColor(hex: "#000000")
+        titleLabel.textColor = seelTheme.primaryText
         
         priceLabel.text = "for -"
         priceLabel.font = UIFont.systemFont(ofSize: 10, weight: .regular)
-        priceLabel.textColor = UIColor(hex: "#000000")
+        priceLabel.textColor = seelTheme.primaryText
         
         poweredLabel.text = "Powered by"
         poweredLabel.font = UIFont.systemFont(ofSize: 7.5, weight: .semibold)
-        poweredLabel.textColor = UIColor(hex: "#565656")
+        poweredLabel.textColor = seelTheme.secondaryText
         
         contentSV.snp.makeConstraints { make in
             make.edges.equalTo(UIEdgeInsets.zero)

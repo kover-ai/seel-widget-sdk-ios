@@ -39,7 +39,7 @@ final class CoverageTitleView: UIView {
     
     func configViews() {
         titleLabel.font = UIFont.systemFont(ofSize: 21, weight: .semibold)
-        titleLabel.textColor = UIColor(hex: "#000000")
+        titleLabel.textColor = seelTheme.primaryText
         titleLabel.adjustsFontSizeToFitWidth = true
         
         contentSV.snp.makeConstraints { make in
